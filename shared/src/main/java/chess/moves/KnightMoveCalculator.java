@@ -20,7 +20,7 @@ public class KnightMoveCalculator implements PieceMoveCalculator {
             int newRow = position.getRow() + move[0];
             int newCol = position.getColumn() + move[1];
 
-            if ((newRow < 0 || newRow >= 8 || newCol < 0 || newCol >= 8)) continue;
+            if ((newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8)) continue;
 
             ChessPosition newPosition = new ChessPosition(newRow, newCol);
             ChessPiece targetSquare = board.getPiece(newPosition);
