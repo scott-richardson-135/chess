@@ -57,6 +57,8 @@ public class ChessPiece {
         ChessPiece piece = board.getPiece(myPosition);
 
         //this is where we want to use the pieceMovesCalculator from the first video
+
+
         if (piece.getPieceType() == PieceType.BISHOP) {
             //implement bishop logic, this is just filler from the video
             return List.of(new ChessMove(new ChessPosition(5,4), new ChessPosition(1,8), null));
