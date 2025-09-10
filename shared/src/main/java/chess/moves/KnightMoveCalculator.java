@@ -4,7 +4,6 @@ import chess.*;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class KnightMoveCalculator implements PieceMoveCalculator {
     @Override
@@ -20,7 +19,7 @@ public class KnightMoveCalculator implements PieceMoveCalculator {
             int newRow = position.getRow() + move[0];
             int newCol = position.getColumn() + move[1];
 
-            if ((newRow < 1 || newRow > 8 || newCol < 1 || newCol > 8)) continue;
+            if (isInBounds(newRow, newCol)) continue;
 
             ChessPosition newPosition = new ChessPosition(newRow, newCol);
             ChessPiece targetSquare = board.getPiece(newPosition);
