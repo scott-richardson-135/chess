@@ -1,5 +1,7 @@
 package chess;
 
+import chess.moves.KnightMoveCalculator;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -58,10 +60,9 @@ public class ChessPiece {
 
         //this is where we want to use the pieceMovesCalculator from the first video
 
-
-        if (piece.getPieceType() == PieceType.BISHOP) {
-            //implement bishop logic, this is just filler from the video
-            return List.of(new ChessMove(new ChessPosition(5,4), new ChessPosition(1,8), null));
+        switch (type) {
+            case KNIGHT:
+                return new KnightMoveCalculator().calculateMoves(board, myPosition);
         }
         return List.of();
     }

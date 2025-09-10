@@ -1,15 +1,36 @@
 package chess.moves;
 
-import chess.ChessBoard;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 public class KnightMoveCalculator implements PieceMoveCalculator {
     @Override
     public Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position) {
-        return List.of();
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        int[][] possibleMoves = {
+                {2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}
+        };
+
+        ChessPiece piece = board.getPiece(position);
+
+        for (int[] move : possibleMoves) {
+            int newRow = position.getRow() + move[0];
+            int newCol = position.getColumn() + move[1];
+
+            if ((newRow < 0 || newRow >= 8 || newCol < 0 || newCol >= 8)) continue;
+
+            ChessPosition newPosition = new ChessPosition(newRow, newCol);
+            ChessPiece targetSquare = board.getPiece(newPosition);
+
+            if (targetSquare == null || targetSquare.getTeamColor() != piece.getTeamColor()) {
+                validMoves.add(new ChessMove(position, newPosition, null));
+            }
+
+
+        }
+        return validMoves;
     }
 }
