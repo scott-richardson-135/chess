@@ -50,6 +50,27 @@ public class MoveUtils {
     }
 
 
+    public static void addStepMove(
+            ChessBoard board,
+            ChessPosition position,
+            ChessPiece piece,
+            int[][] offsets,
+            Collection<ChessMove> validMoves
+    ) {
+        for (int[] offset : offsets) {
+            int newRow = position.getRow() + offset[0];
+            int newCol = position.getColumn() + offset[1];
+
+            if (!isInBounds(newRow, newCol)) continue;
+
+            ChessPosition newPosition = new ChessPosition(newRow, newCol);
+            ChessPiece targetSquare = board.getPiece(newPosition);
+
+            if (targetSquare == null || targetSquare.getTeamColor() != piece.getTeamColor()) {
+                validMoves.add(new ChessMove(position, newPosition, null));
+            }
+        }
+    }
 
 }
 
