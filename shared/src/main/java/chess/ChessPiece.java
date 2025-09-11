@@ -1,7 +1,6 @@
 package chess;
 
-import chess.moves.KingMoveCalculator;
-import chess.moves.KnightMoveCalculator;
+import chess.moves.*;
 
 import java.util.Collection;
 import java.util.List;
@@ -66,6 +65,8 @@ public class ChessPiece {
                 return new KnightMoveCalculator().calculateMoves(board, myPosition);
             case KING:
                 return new KingMoveCalculator().calculateMoves(board, myPosition);
+            case ROOK:
+                return new RookMoveCalculator().calculateMoves(board, myPosition);
 
         }
         return List.of();
