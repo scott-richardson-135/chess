@@ -7,9 +7,8 @@ import java.util.Collection;
 
 public class QueenMoveCalculator implements PieceMoveCalculator {
     @Override
-    public Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position) {
+    public Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position, ChessPiece piece) {
         Collection<ChessMove> validMoves = new ArrayList<>();
-        ChessPiece piece = board.getPiece(position);
         int[][] directions = {
                 {1, 0}, {1, 1}, {0, 1}, {-1, 1}, {-1, 0}, {-1, -1}, {0, -1}, {1, -1}
         };
