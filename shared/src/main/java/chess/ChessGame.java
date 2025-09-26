@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -59,7 +60,7 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+
     }
 
     /**
@@ -69,7 +70,26 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        ChessPosition kingPos = findKing(teamColor);
+
+        TeamColor enemyColor = (teamColor == TeamColor.WHITE)? TeamColor.BLACK : TeamColor.WHITE;
+
+
+        //next up, get a list of positions for each enemy piece
+        //then loop through those and check every piece to see if any of them have moves that hit the king
+        Collection<ChessPosition> enemyPositions = findPositions(enemyColor);
+
+        for (ChessPosition enemyPos : enemyPositions) {
+            ChessPiece enemyPiece = board.getPiece(enemyPos);
+            Collection<ChessMove> possibleMoves = enemyPiece.pieceMoves(board, enemyPos);
+
+            for (ChessMove move : possibleMoves) {
+                if (move.getEndPosition().equals(kingPos)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -109,5 +129,40 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return board;
+    }
+
+    //finds the position of king with given color
+    public ChessPosition findKing(TeamColor color) {
+
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(position);
+                if (piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == color) {
+                    return position;
+                }
+            }
+        }
+
+        throw new RuntimeException("Can't find king for " + color);
+    }
+
+
+    //finds every position where a piece of given color is at
+    public Collection<ChessPosition> findPositions(TeamColor color) {
+        Collection<ChessPosition> enemyPositions = new ArrayList<>();
+
+
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(position);
+                if (piece.getTeamColor() == color) {
+                    enemyPositions.add(position);
+                }
+            }
+        }
+
+        return enemyPositions;
     }
 }
