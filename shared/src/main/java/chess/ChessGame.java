@@ -88,7 +88,20 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        if (piece == null) {
+            throw new InvalidMoveException();
+        }
+        Collection<ChessMove> legalMoves = validMoves(move.getStartPosition());
+
+
+        if (!legalMoves.contains(move) || currentTurn != piece.getTeamColor()) {
+            throw new InvalidMoveException();
+        }
+
+
         movePiece(move);
+
 
     }
 
@@ -200,8 +213,15 @@ public class ChessGame {
         ChessPosition startPosition = move.getStartPosition();
         ChessPiece pieceToMove = board.getPiece(startPosition);
 
+        if (move.getPromotionPiece() != null) {
+            pieceToMove.setPieceType(move.getPromotionPiece());
+        }
         board.addPiece(move.getEndPosition(), pieceToMove);
         board.addPiece(startPosition, null);
+
+        //update current turn
+        TeamColor turnToSwitchTo = (currentTurn == TeamColor.WHITE)? TeamColor.BLACK : TeamColor.WHITE;
+        setTeamTurn(turnToSwitchTo);
     }
 
     @Override
