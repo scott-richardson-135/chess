@@ -51,7 +51,34 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        //get the preliminary moves from this position.
+
+        ChessPiece piece = board.getPiece(startPosition);
+        Collection<ChessMove> possibleMoves = piece.pieceMoves(board, startPosition);
+        Collection<ChessMove> validMoves = new ArrayList<>();
+
+        //loop through each move, and then make the move on a copy of the board. If isInCheck on that copy, remove this move from the list
+        for (ChessMove move : possibleMoves) {
+            ChessBoard boardCopy = board.copy();
+
+            //This is pretty much what happens in the movePiece function but I can't figure out how to get it to work on a different board
+            //maybe someday I can fix that
+            ChessPiece pieceToMove = boardCopy.getPiece(move.getStartPosition());
+            boardCopy.addPiece(move.getEndPosition(), pieceToMove);
+            boardCopy.addPiece(move.getStartPosition(), null);
+
+            //run isInCheck on the board copy
+            ChessGame tempGame = new ChessGame();
+            tempGame.setBoard(boardCopy);
+            tempGame.setTeamTurn(this.currentTurn);
+
+            //add to valid moves if tempGame is not in check for the protagonist team
+            if (!tempGame.isInCheck(piece.getTeamColor())) {
+                validMoves.add(move);
+            }
+
+        }
+        return validMoves;
     }
 
     /**
@@ -61,6 +88,7 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        movePiece(move);
 
     }
 
@@ -165,6 +193,15 @@ public class ChessGame {
         }
 
         return enemyPositions;
+    }
+
+
+    private void movePiece(ChessMove move) {
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPiece pieceToMove = board.getPiece(startPosition);
+
+        board.addPiece(move.getEndPosition(), pieceToMove);
+        board.addPiece(startPosition, null);
     }
 
     @Override
