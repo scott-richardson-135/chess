@@ -34,12 +34,11 @@ public class Handlers {
             } catch (BadRequestException e) {
                 ctx.status(400);
                 ctx.json(new ErrorResponse("Error: " + e.getMessage()));
-            } catch (AlreadyTakenException e) {
-                ctx.status(403);
-                ctx.json(new ErrorResponse("Error: " + e.getMessage()));
-            } catch (DataAccessException e) {
-                ctx.status(500);
-                ctx.json(new ErrorResponse("Error: " + e.getMessage()));
+//            } catch (AlreadyTakenException e) {
+//                ctx.status(403);//                ctx.json(new ErrorResponse("Error: " + e.getMessage()));
+//            } catch (DataAccessException e) {
+//                ctx.status(500);
+//                ctx.json(new ErrorResponse("Error: " + e.getMessage()));
             } catch (Exception e) {
                 ctx.status(500);
                 ctx.json(new ErrorResponse("Error: " + e.getMessage()));
