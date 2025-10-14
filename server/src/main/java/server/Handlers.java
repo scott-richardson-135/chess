@@ -21,41 +21,33 @@ public class Handlers {
 
     public static class RegisterHandler implements Handler {
         @Override
-        public void handle(@NotNull Context ctx) {
-            try {
-                //deserialize body
-                RegisterRequest request = serializer.fromJson(ctx.body(), RegisterRequest.class);
+        public void handle(@NotNull Context ctx) throws Exception {
+            //deserialize body
+            RegisterRequest request = serializer.fromJson(ctx.body(), RegisterRequest.class);
 
-                //pass to service
-                UserService service = new UserService();
-                RegisterResult result = service.register(request);
+            //pass to service
+            UserService service = new UserService();
+            RegisterResult result = service.register(request);
 
-                //return response
-                ctx.status(200);
-                ctx.contentType("application/json");
-                ctx.result(serializer.toJson(result));
-            } catch (BadRequestException | AlreadyTakenException | DataAccessException e) {
-                throw new RuntimeException(e);
-            }
+            //return response
+            ctx.status(200);
+            ctx.contentType("application/json");
+            ctx.result(serializer.toJson(result));
         }
     }
 
 
     public static class ClearHandler implements Handler {
         @Override
-        public void handle(@NotNull Context ctx) {
-            try {
-                ClearService service = new ClearService();
-                service.clear();
+        public void handle(@NotNull Context ctx) throws Exception {
+            ClearService service = new ClearService();
+            service.clear();
 
-                ctx.status(200);
-                ctx.contentType("application/json");
-                ctx.result(serializer.toJson(new ClearResult()));
+            ctx.status(200);
+            ctx.contentType("application/json");
+            ctx.result(serializer.toJson(new ClearResult()));
 
-            } catch (Exception e) {
-                ctx.status(500);
-                throw new RuntimeException(e);
-            }
+
         }
     }
 }
