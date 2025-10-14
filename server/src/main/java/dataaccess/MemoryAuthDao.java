@@ -6,7 +6,7 @@ import service.exceptions.AlreadyTakenException;
 import java.util.HashMap;
 
 public class MemoryAuthDao implements AuthDao {
-    private final HashMap<String, AuthData> auths = new HashMap<>();
+    private static final HashMap<String, AuthData> auths = new HashMap<>();
     @Override
     public void createAuth(AuthData auth) throws DataAccessException {
         if (auths.containsKey(auth.authToken())) {
@@ -24,5 +24,9 @@ public class MemoryAuthDao implements AuthDao {
     @Override
     public void deleteAuth(String authToken) {
         auths.remove(authToken);
+    }
+
+    public void clear() {
+        auths.clear();
     }
 }

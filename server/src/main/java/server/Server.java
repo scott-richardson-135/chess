@@ -18,6 +18,8 @@ public class Server {
         // Register your endpoints and exception handlers here.
         javalin.post("/user", new Handlers.RegisterHandler());
 
+        javalin.delete("/db", new Handlers.ClearHandler());
+
 
 
         //exception handlers

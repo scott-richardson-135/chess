@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 public class MemoryGameDao implements GameDao {
-    HashMap<Integer, GameData> games = new HashMap<>();
+    private static final HashMap<Integer, GameData> games = new HashMap<>();
 
     //might need to figure out a way to make sure game doesn't exist yet
     @Override
@@ -27,6 +27,10 @@ public class MemoryGameDao implements GameDao {
     @Override
     public void updateGame(GameData game) {
         games.put(game.gameID(), game);
+    }
+
+    public void clear() {
+        games.clear();
     }
 
 }

@@ -6,6 +6,7 @@ import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import model.requests.*;
 import model.results.*;
+import service.ClearService;
 import service.UserService;
 import service.UserService.*;
 import service.exceptions.*;
@@ -19,16 +20,11 @@ public class Handlers {
 
 
     public static class RegisterHandler implements Handler {
-
-
-
         @Override
         public void handle(@NotNull Context ctx) {
             try {
                 //deserialize body
                 RegisterRequest request = serializer.fromJson(ctx.body(), RegisterRequest.class);
-
-
 
                 //pass to service
                 UserService service = new UserService();
@@ -42,6 +38,24 @@ public class Handlers {
                 throw new RuntimeException(e);
             }
         }
+    }
 
+
+    public static class ClearHandler implements Handler {
+        @Override
+        public void handle(@NotNull Context ctx) {
+            try {
+                ClearService service = new ClearService();
+                service.clear();
+
+                ctx.status(200);
+                ctx.contentType("application/json");
+                ctx.result(serializer.toJson(new ClearResult()));
+
+            } catch (Exception e) {
+                ctx.status(500);
+                throw new RuntimeException(e);
+            }
+        }
     }
 }
