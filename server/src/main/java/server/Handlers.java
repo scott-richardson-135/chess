@@ -16,6 +16,8 @@ import org.jetbrains.annotations.NotNull;
 
 public class Handlers {
     private static final Gson serializer = new Gson();
+    private static final UserService userService = new UserService();
+    private static final ClearService clearService = new ClearService();
 
 
 
@@ -26,8 +28,7 @@ public class Handlers {
             RegisterRequest request = serializer.fromJson(ctx.body(), RegisterRequest.class);
 
             //pass to service
-            UserService service = new UserService();
-            RegisterResult result = service.register(request);
+            RegisterResult result = userService.register(request);
 
             //return response
             ctx.status(200);
@@ -36,12 +37,25 @@ public class Handlers {
         }
     }
 
+    public static class LoginHandler implements Handler {
+        @Override
+        public void handle(@NotNull Context ctx) throws Exception {
+            LoginRequest request = serializer.fromJson(ctx.body(), LoginRequest.class);
+
+            LoginResult result = userService.login(request);
+
+            ctx.status(200);
+            ctx.contentType("application/json");
+            ctx.result(serializer.toJson(result));
+
+        }
+    }
+
 
     public static class ClearHandler implements Handler {
         @Override
         public void handle(@NotNull Context ctx) throws Exception {
-            ClearService service = new ClearService();
-            service.clear();
+            clearService.clear();
 
             ctx.status(200);
             ctx.contentType("application/json");

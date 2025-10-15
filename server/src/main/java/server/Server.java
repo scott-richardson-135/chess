@@ -6,6 +6,7 @@ import io.javalin.*;
 import model.results.ErrorResponse;
 import service.exceptions.AlreadyTakenException;
 import service.exceptions.BadRequestException;
+import service.exceptions.UnauthorizedException;
 
 public class Server {
 
@@ -18,6 +19,8 @@ public class Server {
         // Register your endpoints and exception handlers here.
         javalin.post("/user", new Handlers.RegisterHandler());
 
+        javalin.post("/session", new Handlers.LoginHandler());
+
         javalin.delete("/db", new Handlers.ClearHandler());
 
 
@@ -25,6 +28,12 @@ public class Server {
         //exception handlers
         javalin.exception(BadRequestException.class, (e, ctx) -> {
             ctx.status(400);
+            ctx.contentType("application/json");
+            ctx.result(serializer.toJson(new ErrorResponse("Error: " + e.getMessage())));
+        });
+
+        javalin.exception(UnauthorizedException.class, (e, ctx) -> {
+            ctx.status(401);
             ctx.contentType("application/json");
             ctx.result(serializer.toJson(new ErrorResponse("Error: " + e.getMessage())));
         });
