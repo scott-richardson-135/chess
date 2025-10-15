@@ -76,6 +76,4 @@ class UserServiceTests {
         assertThrows(UnauthorizedException.class, () -> service.login(loginReq));
     }
 
-
-
 }

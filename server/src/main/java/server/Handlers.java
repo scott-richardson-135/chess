@@ -60,8 +60,6 @@ public class Handlers {
             ctx.status(200);
             ctx.contentType("application/json");
             ctx.result(serializer.toJson(new ClearResult()));
-
-
         }
     }
 }
