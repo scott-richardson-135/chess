@@ -1,13 +1,16 @@
 package service;
 
 import dataaccess.DataAccessException;
+import model.requests.LoginRequest;
 import model.requests.RegisterRequest;
+import model.results.LoginResult;
 import model.results.RegisterResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import service.exceptions.AlreadyTakenException;
 import service.exceptions.BadRequestException;
+import service.exceptions.UnauthorizedException;
 
 import javax.xml.crypto.Data;
 
@@ -49,6 +52,28 @@ class UserServiceTests {
             service.register(request);
         });
 
+    }
+
+    @Test
+    @DisplayName("Valid Login")
+    public void goodLogin() throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
+        RegisterRequest request = new RegisterRequest("username", "password", "email");
+        service.register(request);
+
+        LoginRequest loginReq = new LoginRequest("username", "password");
+        LoginResult loginRes = service.login(loginReq);
+
+        assertNotNull(loginRes);
+        assertEquals("username", loginRes.username());
+        assertNotNull(loginRes.authToken());
+        assertFalse(loginRes.authToken().isEmpty());
+    }
+
+    @Test
+    @DisplayName("User Doesn't Exist")
+    public void badLogin() throws BadRequestException, AlreadyTakenException, DataAccessException {
+        LoginRequest loginReq = new LoginRequest("username", "password");
+        assertThrows(UnauthorizedException.class, () -> service.login(loginReq));
     }
 
 
