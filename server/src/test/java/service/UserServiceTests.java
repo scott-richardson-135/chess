@@ -2,9 +2,12 @@ package service;
 
 import dataaccess.DataAccessException;
 import model.requests.LoginRequest;
+import model.requests.LogoutRequest;
 import model.requests.RegisterRequest;
 import model.results.LoginResult;
+import model.results.LogoutResult;
 import model.results.RegisterResult;
+import org.eclipse.jetty.util.log.Log;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,6 +28,7 @@ class UserServiceTests {
         service = new UserService();
     }
 
+    //Register tests
 
     @Test
     @DisplayName("Valid Register")
@@ -54,6 +58,7 @@ class UserServiceTests {
 
     }
 
+    //Login Tests
     @Test
     @DisplayName("Valid Login")
     public void goodLogin() throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
@@ -74,6 +79,39 @@ class UserServiceTests {
     public void badLogin() throws BadRequestException, AlreadyTakenException, DataAccessException {
         LoginRequest loginReq = new LoginRequest("username", "password");
         assertThrows(UnauthorizedException.class, () -> service.login(loginReq));
+    }
+
+    //Logout tests
+    @Test
+    @DisplayName("Valid Logout")
+    public void goodLogout() throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
+        //register and login
+        RegisterRequest request = new RegisterRequest("username", "password", "email");
+        service.register(request);
+
+        LoginRequest loginReq = new LoginRequest("username", "password");
+        LoginResult loginRes = service.login(loginReq);
+
+        //make sure we got token
+        assertNotNull(loginRes.authToken());
+        assertFalse(loginRes.authToken().isEmpty());
+
+        //logout
+        LogoutRequest logoutReq = new LogoutRequest(loginRes.authToken());
+        service.logout(logoutReq);
+
+        //make sure token was removed, throw an exception if we try a second time
+        assertThrows(UnauthorizedException.class, () -> service.logout(logoutReq));
+
+    }
+
+    @Test
+    @DisplayName("Logout with invalid token")
+    public void badLogout() {
+        LogoutRequest request = new LogoutRequest("faketoken");
+
+        assertThrows(UnauthorizedException.class, () -> service.logout(request));
+
     }
 
 }
