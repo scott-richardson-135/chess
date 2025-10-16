@@ -11,6 +11,7 @@ import service.ClearService;
 import service.UserService;
 import service.UserService.*;
 import service.exceptions.*;
+import service.GameService;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -18,6 +19,7 @@ import org.jetbrains.annotations.NotNull;
 public class Handlers {
     private static final Gson serializer = new Gson();
     private static final UserService userService = new UserService();
+    private static final GameService gameService = new GameService();
     private static final ClearService clearService = new ClearService();
 
 
@@ -55,10 +57,7 @@ public class Handlers {
     public static class LogoutHandler implements Handler {
         @Override
         public void handle(@NotNull Context ctx) throws Exception {
-            String authToken = ctx.header("Authorization");
-            if (authToken == null || authToken.isEmpty()) {
-                throw new UnauthorizedException("Not logged in");
-            }
+            String authToken = getAuthToken(ctx);
 
             LogoutRequest request = new LogoutRequest(authToken);
 
@@ -67,6 +66,22 @@ public class Handlers {
             ctx.status(200);
             ctx.contentType("application/json");
             ctx.result(serializer.toJson(result));
+        }
+    }
+
+    public static class ListHandler implements Handler {
+        @Override
+        public void handle(@NotNull Context ctx) throws UnauthorizedException, BadRequestException, DataAccessException {
+            String authToken = getAuthToken(ctx);
+
+            ListRequest request = new ListRequest(authToken);
+
+            ListResult result =  gameService.list(request);
+
+            ctx.status(200);
+            ctx.contentType("application/json");
+            ctx.result(serializer.toJson(result));
+
         }
     }
 
@@ -80,5 +95,13 @@ public class Handlers {
             ctx.contentType("application/json");
             ctx.result(serializer.toJson(new ClearResult()));
         }
+    }
+
+    private static String getAuthToken(Context ctx) throws UnauthorizedException {
+        String authToken = ctx.header("Authorization");
+        if (authToken == null || authToken.isEmpty()) {
+            throw new UnauthorizedException("Not logged in");
+        }
+        return authToken;
     }
 }

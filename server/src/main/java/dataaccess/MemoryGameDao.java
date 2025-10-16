@@ -9,6 +9,8 @@ public class MemoryGameDao implements GameDao {
     private static final HashMap<Integer, GameData> games = new HashMap<>();
 
     //might need to figure out a way to make sure game doesn't exist yet
+
+    //also maybe create id's here instead of letting users assign them
     @Override
     public void createGame(GameData game) {
         games.put(game.gameID(), game);

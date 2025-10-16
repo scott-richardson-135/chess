@@ -23,6 +23,8 @@ public class Server {
 
         javalin.delete("/session", new Handlers.LogoutHandler());
 
+        javalin.get("/game", new Handlers.ListHandler());
+
         javalin.delete("/db", new Handlers.ClearHandler());
 
 
