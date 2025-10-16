@@ -6,6 +6,7 @@ import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import model.requests.*;
 import model.results.*;
+import org.eclipse.jetty.util.log.Log;
 import service.ClearService;
 import service.UserService;
 import service.UserService.*;
@@ -48,6 +49,24 @@ public class Handlers {
             ctx.contentType("application/json");
             ctx.result(serializer.toJson(result));
 
+        }
+    }
+
+    public static class LogoutHandler implements Handler {
+        @Override
+        public void handle(@NotNull Context ctx) throws Exception {
+            String authToken = ctx.header("Authorization");
+            if (authToken == null || authToken.isEmpty()) {
+                throw new UnauthorizedException("Not logged in");
+            }
+
+            LogoutRequest request = new LogoutRequest(authToken);
+
+            LogoutResult result = userService.logout(request);
+
+            ctx.status(200);
+            ctx.contentType("application/json");
+            ctx.result(serializer.toJson(result));
         }
     }
 

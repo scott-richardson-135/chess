@@ -21,6 +21,8 @@ public class Server {
 
         javalin.post("/session", new Handlers.LoginHandler());
 
+        javalin.delete("/session", new Handlers.LogoutHandler());
+
         javalin.delete("/db", new Handlers.ClearHandler());
 
 

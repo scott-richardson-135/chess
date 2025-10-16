@@ -57,4 +57,22 @@ public class UserService {
 
         return new LoginResult(request.username(), authToken);
     }
+
+    public LogoutResult logout(LogoutRequest request) throws BadRequestException, DataAccessException, UnauthorizedException {
+        if (request.authToken() == null || request.authToken().isEmpty()) {
+            throw new BadRequestException("bad request");
+        }
+
+        //find AuthData by authtoken
+        AuthData token = authDao.getAuth(request.authToken());
+
+        if (token == null) {
+            throw new UnauthorizedException("invalid authtoken");
+        }
+
+        //delete authtoken
+        authDao.deleteAuth(request.authToken());
+
+        return new LogoutResult();
+    }
 }
