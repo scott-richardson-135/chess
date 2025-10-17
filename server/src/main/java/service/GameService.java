@@ -21,11 +21,6 @@ public class GameService {
             throw new BadRequestException("bad request");
         }
 
-//        AuthData token = authDao.getAuth(request.authToken());
-//
-//        if (token == null) {
-//            throw new UnauthorizedException("invalid authtoken");
-//        }
         checkAuth(request.authToken());
 
         Collection<GameData> games = gameDao.listGames();
