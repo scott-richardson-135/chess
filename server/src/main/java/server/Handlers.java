@@ -6,14 +6,14 @@ import io.javalin.http.Context;
 import io.javalin.http.Handler;
 import model.requests.*;
 import model.results.*;
-import org.eclipse.jetty.util.log.Log;
-import service.ClearService;
-import service.UserService;
-import service.UserService.*;
-import service.exceptions.*;
-import service.GameService;
 import org.jetbrains.annotations.NotNull;
+import service.ClearService;
+import service.GameService;
+import service.UserService;
+import service.exceptions.BadRequestException;
+import service.exceptions.UnauthorizedException;
 
+import java.util.Map;
 
 
 public class Handlers {
@@ -82,6 +82,23 @@ public class Handlers {
             ctx.contentType("application/json");
             ctx.result(serializer.toJson(result));
 
+        }
+    }
+
+    public static class CreateHandler implements Handler {
+        @Override
+        public void handle(@NotNull Context ctx) throws UnauthorizedException, BadRequestException, DataAccessException {
+            String authToken = getAuthToken(ctx);
+            var body = serializer.fromJson(ctx.body(), Map.class);
+            String gameName = (String) body.get("gameName"); //best way I could find to extract the body
+
+            CreateRequest request = new CreateRequest(authToken, gameName);
+
+            CreateResult result = gameService.create(request);
+
+            ctx.status(200);
+            ctx.contentType("application/json");
+            ctx.result(serializer.toJson(result));
         }
     }
 

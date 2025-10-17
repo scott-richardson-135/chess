@@ -7,13 +7,15 @@ import java.util.HashMap;
 
 public class MemoryGameDao implements GameDao {
     private static final HashMap<Integer, GameData> games = new HashMap<>();
+    private static int nextId = 1;
 
-    //might need to figure out a way to make sure game doesn't exist yet
 
-    //also maybe create id's here instead of letting users assign them
     @Override
-    public void createGame(GameData game) {
-        games.put(game.gameID(), game);
+    public GameData createGame(GameData game) {
+        int id = nextId++;
+        GameData newGame = new GameData(id, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+        games.put(id, game);
+        return newGame;
     }
 
     @Override
@@ -33,6 +35,7 @@ public class MemoryGameDao implements GameDao {
 
     public void clear() {
         games.clear();
+        nextId = 1;
     }
 
 }

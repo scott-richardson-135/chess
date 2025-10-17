@@ -2,7 +2,7 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
-import io.javalin.*;
+import io.javalin.Javalin;
 import model.results.ErrorResponse;
 import service.exceptions.AlreadyTakenException;
 import service.exceptions.BadRequestException;
@@ -24,6 +24,8 @@ public class Server {
         javalin.delete("/session", new Handlers.LogoutHandler());
 
         javalin.get("/game", new Handlers.ListHandler());
+
+        javalin.post("/game", new Handlers.CreateHandler());
 
         javalin.delete("/db", new Handlers.ClearHandler());
 
