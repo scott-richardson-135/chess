@@ -4,6 +4,7 @@ import dataaccess.DataAccessException;
 import model.requests.CreateRequest;
 import model.requests.ListRequest;
 import model.requests.RegisterRequest;
+import model.results.CreateResult;
 import model.results.ListResult;
 import model.results.RegisterResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -32,15 +33,16 @@ class GameServiceTests {
     public void goodList() throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
         RegisterRequest request = new RegisterRequest("username", "password", "email");
         RegisterResult regResult = UserService.register(request);
+        String authToken = regResult.authToken();
 
 
-        CreateRequest create1 = new CreateRequest(regResult.authToken(), "game1");
-        CreateRequest create2 = new CreateRequest(regResult.authToken(), "game2");
+        CreateRequest create1 = new CreateRequest(authToken, "game1");
+        CreateRequest create2 = new CreateRequest(authToken, "game2");
 
         GameService.create(create1);
         GameService.create(create2);
 
-        ListRequest listRequest = new ListRequest(regResult.authToken());
+        ListRequest listRequest = new ListRequest(authToken);
         ListResult listResult = GameService.list(listRequest);
 
         assertNotNull(listResult);
@@ -57,6 +59,29 @@ class GameServiceTests {
 
     }
 
+    //create tests
+    @Test
+    @DisplayName("Valid create")
+    public void goodCreate() throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
+        RegisterRequest request = new RegisterRequest("username", "password", "email");
+        RegisterResult regResult = UserService.register(request);
+        String authToken = regResult.authToken();
+
+        CreateRequest createRequest = new CreateRequest(authToken, "testGame");
+        CreateResult result = GameService.create(createRequest);
+
+        assertNotNull(result);
+        assertTrue(result.gameID() > 0);
+    }
+
+    @Test
+    @DisplayName("Create with invalid token")
+    public void badCreate() {
+        CreateRequest request = new CreateRequest("faketoken", "cooked");
+
+        assertThrows(UnauthorizedException.class, () -> GameService.create(request));
+
+    }
 
 
 }
