@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
+import service.exceptions.AlreadyTakenException;
 import service.exceptions.BadRequestException;
 import service.exceptions.UnauthorizedException;
 
@@ -95,6 +96,26 @@ public class Handlers {
             CreateRequest request = new CreateRequest(authToken, gameName);
 
             CreateResult result = gameService.create(request);
+
+            ctx.status(200);
+            ctx.contentType("application/json");
+            ctx.result(serializer.toJson(result));
+        }
+    }
+
+    public static class JoinHandler implements Handler {
+        @Override
+        public void handle(@NotNull Context ctx) throws UnauthorizedException, BadRequestException, DataAccessException, AlreadyTakenException {
+            String authToken = getAuthToken(ctx);
+            JoinBody body = serializer.fromJson(ctx.body(), JoinBody.class);
+            if (body == null || body.playerColor() == null || body.playerColor().isEmpty() || body.gameID() == null) {
+                throw new BadRequestException("bad request");
+            }
+
+            JoinRequest request = new JoinRequest(authToken, body.playerColor(), body.gameID());
+
+            JoinResult result = gameService.join(request);
+
 
             ctx.status(200);
             ctx.contentType("application/json");

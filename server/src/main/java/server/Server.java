@@ -27,6 +27,8 @@ public class Server {
 
         javalin.post("/game", new Handlers.CreateHandler());
 
+        javalin.put("/game", new Handlers.JoinHandler());
+
         javalin.delete("/db", new Handlers.ClearHandler());
 
 
