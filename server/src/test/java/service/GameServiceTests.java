@@ -22,8 +22,8 @@ import service.exceptions.UnauthorizedException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameServiceTests {
-    private final GameService GAME_SERVICE = new GameService();
-    private final UserService USER_SERVICE = new UserService();
+    private static final GameService GAME_SERVICE = new GameService();
+    private static final UserService USER_SERVICE = new UserService();
     private GameDao gameDao = new MemoryGameDao();
 
     @BeforeEach
