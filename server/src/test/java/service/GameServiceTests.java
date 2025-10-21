@@ -1,10 +1,15 @@
 package service;
 
 import dataaccess.DataAccessException;
+import dataaccess.GameDao;
+import dataaccess.MemoryGameDao;
+import model.GameData;
 import model.requests.CreateRequest;
+import model.requests.JoinRequest;
 import model.requests.ListRequest;
 import model.requests.RegisterRequest;
 import model.results.CreateResult;
+import model.results.JoinResult;
 import model.results.ListResult;
 import model.results.RegisterResult;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class GameServiceTests {
     private GameService GameService;
     private UserService UserService;
+    private GameDao gameDao = new MemoryGameDao();
 
     @BeforeEach
     public void setup() {
@@ -81,6 +87,38 @@ class GameServiceTests {
 
         assertThrows(UnauthorizedException.class, () -> GameService.create(request));
 
+    }
+
+    @Test
+    @DisplayName("Valid join")
+    public void goodJoin() throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
+        RegisterRequest request = new RegisterRequest("username", "password", "email");
+        RegisterResult regResult = UserService.register(request);
+        String authToken = regResult.authToken();
+
+        CreateRequest createRequest = new CreateRequest(authToken, "testGame");
+        CreateResult createResult = GameService.create(createRequest);
+
+        JoinRequest joinRequest = new JoinRequest(authToken, "WHITE", createResult.gameID());
+        JoinResult joinResult = GameService.join(joinRequest);
+
+        assertNotNull(joinRequest);
+
+        GameData game = gameDao.getGame(createResult.gameID());
+        assertNotNull(game);
+
+        assertEquals("username", game.whiteUsername());
+        assertNull(game.blackUsername());
+        assertEquals("testGame", game.gameName());
+
+    }
+
+    @Test
+    @DisplayName("Join with invalid token")
+    public void badJoin() {
+        JoinRequest request = new JoinRequest("faketoken", "color", 1);
+
+        assertThrows(UnauthorizedException.class, () -> GameService.join(request));
     }
 
 
