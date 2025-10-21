@@ -49,7 +49,7 @@ public class GameService {
 
     public JoinResult join(JoinRequest request) throws BadRequestException, UnauthorizedException, DataAccessException, AlreadyTakenException {
         if (request.authToken() == null || request.authToken().isEmpty() ||
-                request.playerColor() == null || request.playerColor().isEmpty() || request.ID() == 0) {
+                request.playerColor() == null || request.playerColor().isEmpty() || request.iD() == 0) {
             throw new BadRequestException("bad request");
         }
 
@@ -58,7 +58,7 @@ public class GameService {
         String username = token.username();
 
 
-        GameData requestedGame = GAME_DAO.getGame(request.ID());
+        GameData requestedGame = GAME_DAO.getGame(request.iD());
         if (requestedGame == null) {
             throw new BadRequestException("game does not exist");
         }
