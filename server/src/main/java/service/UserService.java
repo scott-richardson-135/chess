@@ -3,37 +3,45 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
-import model.requests.*;
-import model.results.*;
-import service.exceptions.*;
+import model.requests.LoginRequest;
+import model.requests.LogoutRequest;
+import model.requests.RegisterRequest;
+import model.results.LoginResult;
+import model.results.LogoutResult;
+import model.results.RegisterResult;
+import service.exceptions.AlreadyTakenException;
+import service.exceptions.BadRequestException;
+import service.exceptions.UnauthorizedException;
 
 import java.util.UUID;
 
 public class UserService {
 
-    private static final UserDao userDao = new MemoryUserDao();
-    private static final AuthDao authDao = new MemoryAuthDao();
+    private static final UserDao USER_DAO = new MemoryUserDao();
+    private static final AuthDao AUTH_DAO = new MemoryAuthDao();
 
     public RegisterResult register(RegisterRequest request) throws BadRequestException, AlreadyTakenException, DataAccessException {
         //do logic for registering using model and dao classes
         //check for bad request
-        if (request.username() == null || request.username().isEmpty() || request.password() == null || request.password().isEmpty() || request.email() == null || request.email().isEmpty()) {
+        if (request.username() == null || request.username().isEmpty()
+                || request.password() == null || request.password().isEmpty()
+                || request.email() == null || request.email().isEmpty()) {
             throw new BadRequestException("bad request");
         }
 
         //check if already taken
-        if (userDao.getUser(request.username()) != null) {
+        if (USER_DAO.getUser(request.username()) != null) {
             throw new AlreadyTakenException("user already taken");
         }
 
         //create user with Dao
         UserData newUser = new UserData(request.username(), request.password(), request.email());
-        userDao.createUser(newUser);
+        USER_DAO.createUser(newUser);
 
         //create authtoken
         String authToken = UUID.randomUUID().toString();
         AuthData authData = new AuthData(authToken, request.username());
-        authDao.createAuth(authData);
+        AUTH_DAO.createAuth(authData);
 
         return new RegisterResult(request.username(), authToken);
     }
@@ -45,7 +53,7 @@ public class UserService {
         }
 
         //find user by username, check if valid
-        UserData user = userDao.getUser(request.username());
+        UserData user = USER_DAO.getUser(request.username());
         if (user == null || !user.password().equals(request.password())) {
             throw new UnauthorizedException("invalid username or password");
         }
@@ -53,7 +61,7 @@ public class UserService {
         //create authToken
         String authToken = UUID.randomUUID().toString();
         AuthData authData = new AuthData(authToken, request.username());
-        authDao.createAuth(authData);
+        AUTH_DAO.createAuth(authData);
 
         return new LoginResult(request.username(), authToken);
     }
@@ -64,14 +72,14 @@ public class UserService {
         }
 
         //find AuthData by authtoken
-        AuthData token = authDao.getAuth(request.authToken());
+        AuthData token = AUTH_DAO.getAuth(request.authToken());
 
         if (token == null) {
             throw new UnauthorizedException("invalid authtoken");
         }
 
         //delete authtoken
-        authDao.deleteAuth(request.authToken());
+        AUTH_DAO.deleteAuth(request.authToken());
 
         return new LogoutResult();
     }

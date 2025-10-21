@@ -16,8 +16,8 @@ import service.exceptions.UnauthorizedException;
 import java.util.Collection;
 
 public class GameService {
-    private static final GameDao gameDao = new MemoryGameDao();
-    private static final AuthDao authDao = new MemoryAuthDao();
+    private static final GameDao GAME_DAO = new MemoryGameDao();
+    private static final AuthDao AUTH_DAO = new MemoryAuthDao();
 
     public ListResult list(ListRequest request) throws UnauthorizedException, BadRequestException, DataAccessException {
         if (request.authToken() == null || request.authToken().isEmpty()) {
@@ -26,7 +26,7 @@ public class GameService {
 
         checkAuth(request.authToken());
 
-        Collection<GameData> games = gameDao.listGames();
+        Collection<GameData> games = GAME_DAO.listGames();
 
         return new ListResult(games);
     }
@@ -41,7 +41,7 @@ public class GameService {
 
         GameData newGame = new GameData(0, null, null, request.gameName(), null);
 
-        GameData storedGame = gameDao.createGame(newGame);
+        GameData storedGame = GAME_DAO.createGame(newGame);
 
 
         return new CreateResult(storedGame.gameID());
@@ -54,11 +54,11 @@ public class GameService {
         }
 
         checkAuth(request.authToken());
-        AuthData token = authDao.getAuth(request.authToken());
+        AuthData token = AUTH_DAO.getAuth(request.authToken());
         String username = token.username();
 
 
-        GameData requestedGame = gameDao.getGame(request.ID());
+        GameData requestedGame = GAME_DAO.getGame(request.ID());
         if (requestedGame == null) {
             throw new BadRequestException("game does not exist");
         }
@@ -99,13 +99,13 @@ public class GameService {
             throw new BadRequestException("invalid color");
         }
 
-        gameDao.updateGame(requestedGame);
+        GAME_DAO.updateGame(requestedGame);
 
         return new JoinResult();
     }
 
     private void checkAuth(String authToken) throws UnauthorizedException, DataAccessException {
-        AuthData token = authDao.getAuth(authToken);
+        AuthData token = AUTH_DAO.getAuth(authToken);
 
         if (token == null) {
             throw new UnauthorizedException("invalid authtoken");

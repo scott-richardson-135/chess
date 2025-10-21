@@ -1,6 +1,9 @@
 package chess.moves;
 
-import chess.*;
+import chess.ChessBoard;
+import chess.ChessMove;
+import chess.ChessPiece;
+import chess.ChessPosition;
 
 import java.util.Collection;
 
@@ -28,7 +31,9 @@ public class MoveUtils {
                 newRow += direction[0];
                 newCol += direction[1];
 
-                if (!isInBounds(newRow, newCol)) break;
+                if (!isInBounds(newRow, newCol)) {
+                    break;
+                }
 
                 ChessPosition newPosition = new ChessPosition(newRow, newCol);
                 ChessPiece targetSquare = board.getPiece(newPosition);
@@ -61,7 +66,9 @@ public class MoveUtils {
             int newRow = position.getRow() + offset[0];
             int newCol = position.getColumn() + offset[1];
 
-            if (!isInBounds(newRow, newCol)) continue;
+            if (!isInBounds(newRow, newCol)) {
+                continue;
+            }
 
             ChessPosition newPosition = new ChessPosition(newRow, newCol);
             ChessPiece targetSquare = board.getPiece(newPosition);

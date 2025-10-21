@@ -61,7 +61,9 @@ public class PawnMoveCalculator implements PieceMoveCalculator {
             int captureRow = position.getRow() + dir[0];
             int captureCol = position.getColumn() + dir[1];
 
-            if (!MoveUtils.isInBounds(captureRow, captureCol)) continue;
+            if (!MoveUtils.isInBounds(captureRow, captureCol)) {
+                continue;
+            }
 
             ChessPosition capturePosition = new ChessPosition(captureRow, captureCol);
             ChessPiece targetSquare = board.getPiece(capturePosition);
@@ -76,8 +78,15 @@ public class PawnMoveCalculator implements PieceMoveCalculator {
     }
 
 
-    private void checkPromotion(ChessPiece piece, int newRow, Collection<ChessMove> validMoves, ChessPosition startPosition, ChessPosition endPosition) {
-        if ((piece.getTeamColor() == ChessGame.TeamColor.WHITE && newRow == 8) || (piece.getTeamColor() == ChessGame.TeamColor.BLACK && newRow == 1)) {
+    private void checkPromotion(ChessPiece piece,
+                                int newRow,
+                                Collection<ChessMove> validMoves,
+                                ChessPosition startPosition,
+                                ChessPosition endPosition) {
+
+
+        if ((piece.getTeamColor() == ChessGame.TeamColor.WHITE && newRow == 8)
+                || (piece.getTeamColor() == ChessGame.TeamColor.BLACK && newRow == 1)) {
             validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.QUEEN));
             validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.ROOK));
             validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.BISHOP));

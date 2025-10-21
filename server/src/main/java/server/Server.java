@@ -11,7 +11,7 @@ import service.exceptions.UnauthorizedException;
 public class Server {
 
     private final Javalin javalin;
-    private static final Gson serializer = new Gson();
+    private static final Gson SERIALIZER = new Gson();
 
     public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
@@ -37,31 +37,31 @@ public class Server {
         javalin.exception(BadRequestException.class, (e, ctx) -> {
             ctx.status(400);
             ctx.contentType("application/json");
-            ctx.result(serializer.toJson(new ErrorResponse("Error: " + e.getMessage())));
+            ctx.result(SERIALIZER.toJson(new ErrorResponse("Error: " + e.getMessage())));
         });
 
         javalin.exception(UnauthorizedException.class, (e, ctx) -> {
             ctx.status(401);
             ctx.contentType("application/json");
-            ctx.result(serializer.toJson(new ErrorResponse("Error: " + e.getMessage())));
+            ctx.result(SERIALIZER.toJson(new ErrorResponse("Error: " + e.getMessage())));
         });
 
         javalin.exception(AlreadyTakenException.class, (e, ctx) -> {
             ctx.status(403);
             ctx.contentType("application/json");
-            ctx.result(serializer.toJson(new ErrorResponse("Error: " + e.getMessage())));
+            ctx.result(SERIALIZER.toJson(new ErrorResponse("Error: " + e.getMessage())));
         });
 
         javalin.exception(DataAccessException.class, (e, ctx) -> {
             ctx.status(500);
             ctx.contentType("application/json");
-            ctx.result(serializer.toJson(new ErrorResponse("Error: " + e.getMessage())));
+            ctx.result(SERIALIZER.toJson(new ErrorResponse("Error: " + e.getMessage())));
         });
 
         javalin.exception(Exception.class, (e, ctx) -> {
             ctx.status(500);
             ctx.contentType("application/json");
-            ctx.result(serializer.toJson(new ErrorResponse("Error: " + e.getMessage())));
+            ctx.result(SERIALIZER.toJson(new ErrorResponse("Error: " + e.getMessage())));
         });
     }
 

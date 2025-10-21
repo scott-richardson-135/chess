@@ -1,32 +1,31 @@
 package dataaccess;
 
 import model.AuthData;
-import service.exceptions.AlreadyTakenException;
 
 import java.util.HashMap;
 
 public class MemoryAuthDao implements AuthDao {
-    private static final HashMap<String, AuthData> auths = new HashMap<>();
+    private static final HashMap<String, AuthData> AUTHS = new HashMap<>();
     @Override
     public void createAuth(AuthData auth) throws DataAccessException {
-        if (auths.containsKey(auth.authToken())) {
+        if (AUTHS.containsKey(auth.authToken())) {
             throw new DataAccessException("Auth token already exists");
         }
 
-        auths.put(auth.authToken(), auth);
+        AUTHS.put(auth.authToken(), auth);
     }
 
     @Override
     public AuthData getAuth(String authToken) {
-        return auths.get(authToken);
+        return AUTHS.get(authToken);
     }
 
     @Override
     public void deleteAuth(String authToken) {
-        auths.remove(authToken);
+        AUTHS.remove(authToken);
     }
 
     public void clear() {
-        auths.clear();
+        AUTHS.clear();
     }
 }

@@ -22,15 +22,15 @@ import service.exceptions.UnauthorizedException;
 import static org.junit.jupiter.api.Assertions.*;
 
 class GameServiceTests {
-    private GameService GameService;
-    private UserService UserService;
+    private static GameService GAME_SERVICE;
+    private static UserService USER_SERVICE;
     private GameDao gameDao = new MemoryGameDao();
 
     @BeforeEach
     public void setup() {
         new ClearService().clear();
-        GameService = new GameService();
-        UserService = new UserService();
+        GAME_SERVICE = new GameService();
+        USER_SERVICE = new UserService();
     }
 
     //list tests
@@ -38,18 +38,18 @@ class GameServiceTests {
     @DisplayName("Valid list")
     public void goodList() throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
         RegisterRequest request = new RegisterRequest("username", "password", "email");
-        RegisterResult regResult = UserService.register(request);
+        RegisterResult regResult = USER_SERVICE.register(request);
         String authToken = regResult.authToken();
 
 
         CreateRequest create1 = new CreateRequest(authToken, "game1");
         CreateRequest create2 = new CreateRequest(authToken, "game2");
 
-        GameService.create(create1);
-        GameService.create(create2);
+        GAME_SERVICE.create(create1);
+        GAME_SERVICE.create(create2);
 
         ListRequest listRequest = new ListRequest(authToken);
-        ListResult listResult = GameService.list(listRequest);
+        ListResult listResult = GAME_SERVICE.list(listRequest);
 
         assertNotNull(listResult);
         assertNotNull(listResult.games());
@@ -61,7 +61,7 @@ class GameServiceTests {
     public void badList() {
         ListRequest request = new ListRequest("faketoken");
 
-        assertThrows(UnauthorizedException.class, () -> GameService.list(request));
+        assertThrows(UnauthorizedException.class, () -> GAME_SERVICE.list(request));
 
     }
 
@@ -70,11 +70,11 @@ class GameServiceTests {
     @DisplayName("Valid create")
     public void goodCreate() throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
         RegisterRequest request = new RegisterRequest("username", "password", "email");
-        RegisterResult regResult = UserService.register(request);
+        RegisterResult regResult = USER_SERVICE.register(request);
         String authToken = regResult.authToken();
 
         CreateRequest createRequest = new CreateRequest(authToken, "testGame");
-        CreateResult result = GameService.create(createRequest);
+        CreateResult result = GAME_SERVICE.create(createRequest);
 
         assertNotNull(result);
         assertTrue(result.gameID() > 0);
@@ -85,7 +85,7 @@ class GameServiceTests {
     public void badCreate() {
         CreateRequest request = new CreateRequest("faketoken", "cooked");
 
-        assertThrows(UnauthorizedException.class, () -> GameService.create(request));
+        assertThrows(UnauthorizedException.class, () -> GAME_SERVICE.create(request));
 
     }
 
@@ -93,14 +93,14 @@ class GameServiceTests {
     @DisplayName("Valid join")
     public void goodJoin() throws BadRequestException, AlreadyTakenException, DataAccessException, UnauthorizedException {
         RegisterRequest request = new RegisterRequest("username", "password", "email");
-        RegisterResult regResult = UserService.register(request);
+        RegisterResult regResult = USER_SERVICE.register(request);
         String authToken = regResult.authToken();
 
         CreateRequest createRequest = new CreateRequest(authToken, "testGame");
-        CreateResult createResult = GameService.create(createRequest);
+        CreateResult createResult = GAME_SERVICE.create(createRequest);
 
         JoinRequest joinRequest = new JoinRequest(authToken, "WHITE", createResult.gameID());
-        JoinResult joinResult = GameService.join(joinRequest);
+        JoinResult joinResult = GAME_SERVICE.join(joinRequest);
 
         assertNotNull(joinRequest);
 
@@ -118,7 +118,7 @@ class GameServiceTests {
     public void badJoin() {
         JoinRequest request = new JoinRequest("faketoken", "color", 1);
 
-        assertThrows(UnauthorizedException.class, () -> GameService.join(request));
+        assertThrows(UnauthorizedException.class, () -> GAME_SERVICE.join(request));
     }
 
 

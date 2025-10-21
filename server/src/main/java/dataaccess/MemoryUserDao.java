@@ -5,19 +5,19 @@ import model.UserData;
 import java.util.HashMap;
 
 public class MemoryUserDao implements UserDao {
-    private static final HashMap<String, UserData> users = new HashMap<>();
+    private static final HashMap<String, UserData> USERS = new HashMap<>();
     @Override
     public void createUser(UserData u) {
-        users.put(u.username(), u);
+        USERS.put(u.username(), u);
     }
 
     @Override
     public UserData getUser(String username) {
-        return users.get(username);
+        return USERS.get(username);
     }
 
     public void clear() {
-        users.clear();
+        USERS.clear();
     }
 
 }

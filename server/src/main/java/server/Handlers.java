@@ -18,10 +18,10 @@ import java.util.Map;
 
 
 public class Handlers {
-    private static final Gson serializer = new Gson();
-    private static final UserService userService = new UserService();
-    private static final GameService gameService = new GameService();
-    private static final ClearService clearService = new ClearService();
+    private static final Gson SERIALIZER = new Gson();
+    private static final UserService USER_SERVICE = new UserService();
+    private static final GameService GAME_SERVICE = new GameService();
+    private static final ClearService CLEAR_SERVICE = new ClearService();
 
 
 
@@ -29,28 +29,28 @@ public class Handlers {
         @Override
         public void handle(@NotNull Context ctx) throws Exception {
             //deserialize body
-            RegisterRequest request = serializer.fromJson(ctx.body(), RegisterRequest.class);
+            RegisterRequest request = SERIALIZER.fromJson(ctx.body(), RegisterRequest.class);
 
             //pass to service
-            RegisterResult result = userService.register(request);
+            RegisterResult result = USER_SERVICE.register(request);
 
             //return response
             ctx.status(200);
             ctx.contentType("application/json");
-            ctx.result(serializer.toJson(result));
+            ctx.result(SERIALIZER.toJson(result));
         }
     }
 
     public static class LoginHandler implements Handler {
         @Override
         public void handle(@NotNull Context ctx) throws Exception {
-            LoginRequest request = serializer.fromJson(ctx.body(), LoginRequest.class);
+            LoginRequest request = SERIALIZER.fromJson(ctx.body(), LoginRequest.class);
 
-            LoginResult result = userService.login(request);
+            LoginResult result = USER_SERVICE.login(request);
 
             ctx.status(200);
             ctx.contentType("application/json");
-            ctx.result(serializer.toJson(result));
+            ctx.result(SERIALIZER.toJson(result));
 
         }
     }
@@ -62,11 +62,11 @@ public class Handlers {
 
             LogoutRequest request = new LogoutRequest(authToken);
 
-            LogoutResult result = userService.logout(request);
+            LogoutResult result = USER_SERVICE.logout(request);
 
             ctx.status(200);
             ctx.contentType("application/json");
-            ctx.result(serializer.toJson(result));
+            ctx.result(SERIALIZER.toJson(result));
         }
     }
 
@@ -77,11 +77,11 @@ public class Handlers {
 
             ListRequest request = new ListRequest(authToken);
 
-            ListResult result =  gameService.list(request);
+            ListResult result =  GAME_SERVICE.list(request);
 
             ctx.status(200);
             ctx.contentType("application/json");
-            ctx.result(serializer.toJson(result));
+            ctx.result(SERIALIZER.toJson(result));
 
         }
     }
@@ -90,16 +90,16 @@ public class Handlers {
         @Override
         public void handle(@NotNull Context ctx) throws UnauthorizedException, BadRequestException, DataAccessException {
             String authToken = getAuthToken(ctx);
-            var body = serializer.fromJson(ctx.body(), Map.class);
+            var body = SERIALIZER.fromJson(ctx.body(), Map.class);
             String gameName = (String) body.get("gameName"); //best way I could find to extract the body
 
             CreateRequest request = new CreateRequest(authToken, gameName);
 
-            CreateResult result = gameService.create(request);
+            CreateResult result = GAME_SERVICE.create(request);
 
             ctx.status(200);
             ctx.contentType("application/json");
-            ctx.result(serializer.toJson(result));
+            ctx.result(SERIALIZER.toJson(result));
         }
     }
 
@@ -107,19 +107,19 @@ public class Handlers {
         @Override
         public void handle(@NotNull Context ctx) throws UnauthorizedException, BadRequestException, DataAccessException, AlreadyTakenException {
             String authToken = getAuthToken(ctx);
-            JoinBody body = serializer.fromJson(ctx.body(), JoinBody.class);
+            JoinBody body = SERIALIZER.fromJson(ctx.body(), JoinBody.class);
             if (body == null || body.playerColor() == null || body.playerColor().isEmpty() || body.gameID() == null) {
                 throw new BadRequestException("bad request");
             }
 
             JoinRequest request = new JoinRequest(authToken, body.playerColor(), body.gameID());
 
-            JoinResult result = gameService.join(request);
+            JoinResult result = GAME_SERVICE.join(request);
 
 
             ctx.status(200);
             ctx.contentType("application/json");
-            ctx.result(serializer.toJson(result));
+            ctx.result(SERIALIZER.toJson(result));
         }
     }
 
@@ -127,11 +127,11 @@ public class Handlers {
     public static class ClearHandler implements Handler {
         @Override
         public void handle(@NotNull Context ctx) throws Exception {
-            clearService.clear();
+            CLEAR_SERVICE.clear();
 
             ctx.status(200);
             ctx.contentType("application/json");
-            ctx.result(serializer.toJson(new ClearResult()));
+            ctx.result(SERIALIZER.toJson(new ClearResult()));
         }
     }
 

@@ -6,7 +6,7 @@ import java.util.Collection;
 import java.util.HashMap;
 
 public class MemoryGameDao implements GameDao {
-    private static final HashMap<Integer, GameData> games = new HashMap<>();
+    private static final HashMap<Integer, GameData> GAMES = new HashMap<>();
     private static int nextId = 1;
 
 
@@ -14,27 +14,27 @@ public class MemoryGameDao implements GameDao {
     public GameData createGame(GameData game) {
         int id = nextId++;
         GameData newGame = new GameData(id, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
-        games.put(id, newGame);
+        GAMES.put(id, newGame);
         return newGame;
     }
 
     @Override
     public GameData getGame(int gameId) {
-        return games.get(gameId);
+        return GAMES.get(gameId);
     }
 
     @Override
     public Collection<GameData> listGames() {
-        return games.values();
+        return GAMES.values();
     }
 
     @Override
     public void updateGame(GameData game) {
-        games.put(game.gameID(), game);
+        GAMES.put(game.gameID(), game);
     }
 
     public void clear() {
-        games.clear();
+        GAMES.clear();
         nextId = 1;
     }
 
