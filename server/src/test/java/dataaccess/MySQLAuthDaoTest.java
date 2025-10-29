@@ -55,6 +55,36 @@ class MySQLAuthDaoTest {
         assertNull(result);
     }
 
+    @Test
+    @DisplayName("Valid delete")
+    void goodDeleteAuth() throws DataAccessException {
+        AuthData auth1 = new AuthData("fakeToken", "benny");
+        AuthData auth2 = new AuthData("differentToken", "luffy");
+
+        authDao.createAuth(auth1);
+        authDao.createAuth(auth2);
+
+        assertDoesNotThrow(() -> authDao.deleteAuth("fakeToken"));
+
+        AuthData result = authDao.getAuth("fakeToken");
+
+        assertNull(result);
+    }
+
+    @Test
+    @DisplayName("Delete nonexistent auth")
+    void badDeleteAuth() throws DataAccessException {
+        AuthData auth = new AuthData("realToken", "zoro");
+        authDao.createAuth(auth);
+
+        assertDoesNotThrow(() -> authDao.deleteAuth("fakeToken"));
+
+        //make sure our db didn't change
+        AuthData result = authDao.getAuth("realToken");
+        assertNotNull(result);
+        assertEquals("zoro", result.username());
+    }
+
 
 
     @Test
