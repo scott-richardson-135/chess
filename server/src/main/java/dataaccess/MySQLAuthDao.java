@@ -7,9 +7,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-import static java.sql.Statement.RETURN_GENERATED_KEYS;
-import static java.sql.Types.NULL;
-
 public class MySQLAuthDao implements AuthDao {
 
     public MySQLAuthDao() throws DataAccessException {
@@ -19,7 +16,7 @@ public class MySQLAuthDao implements AuthDao {
     @Override
     public void createAuth(AuthData auth) throws DataAccessException {
         var statement = "INSERT INTO auths (authToken, username) VALUES (?,?)";
-        executeUpdate(statement, auth.authToken(), auth.username());
+        DatabaseHelper.executeUpdate(statement, auth.authToken(), auth.username());
     }
 
     @Override
@@ -47,45 +44,14 @@ public class MySQLAuthDao implements AuthDao {
     @Override
     public void deleteAuth(String authToken) throws DataAccessException {
         var statement = "DELETE FROM auths WHERE authToken=?";
-        executeUpdate(statement, authToken);
+        DatabaseHelper.executeUpdate(statement, authToken);
     }
 
     @Override
     public void clear() throws DataAccessException {
         var statement = "TRUNCATE auths";
-        executeUpdate(statement);
+        DatabaseHelper.executeUpdate(statement);
     }
 
-    //maybe put configure and execute update in a helper class
-    private int executeUpdate(String statement, Object... params) throws DataAccessException {
-        try (Connection conn = DatabaseManager.getConnection()) {
-            try (PreparedStatement ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
-                for (int i = 0; i < params.length; i++) {
-                    Object param = params[i];
-                    if (param instanceof String p) {
-                        ps.setString(i + 1, p);
-                    }
-                    else if (param instanceof Integer p) {
-                        ps.setInt(i + 1, p);
-                    }
-                    else if (param == null) {
-                        ps.setNull(i + 1, NULL);
-                    }
-
-                }
-                ps.executeUpdate();
-
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
-                }
-
-                return 0;
-            }
-        } catch (SQLException e) {
-            throw new DataAccessException("Unable to update database: " + e.getMessage(), e);
-        }
-
-    }
 
 }
