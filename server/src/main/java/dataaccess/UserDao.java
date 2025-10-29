@@ -6,5 +6,5 @@ import model.UserData;
 public interface UserDao {
     void createUser(UserData u) throws DataAccessException;
     UserData getUser(String username) throws DataAccessException;
-    void clear();
+    void clear() throws DataAccessException;
 }

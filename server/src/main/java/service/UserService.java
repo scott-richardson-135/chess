@@ -9,6 +9,7 @@ import model.requests.RegisterRequest;
 import model.results.LoginResult;
 import model.results.LogoutResult;
 import model.results.RegisterResult;
+import org.mindrot.jbcrypt.BCrypt;
 import service.exceptions.AlreadyTakenException;
 import service.exceptions.BadRequestException;
 import service.exceptions.UnauthorizedException;
@@ -35,7 +36,8 @@ public class UserService {
         }
 
         //create user with Dao
-        UserData newUser = new UserData(request.username(), request.password(), request.email());
+        String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
+        UserData newUser = new UserData(request.username(), hashedPassword, request.email());
         USER_DAO.createUser(newUser);
 
         //create authtoken
@@ -54,7 +56,7 @@ public class UserService {
 
         //find user by username, check if valid
         UserData user = USER_DAO.getUser(request.username());
-        if (user == null || !user.password().equals(request.password())) {
+        if (user == null || !BCrypt.checkpw(request.password(), user.password())) {
             throw new UnauthorizedException("invalid username or password");
         }
 
