@@ -5,8 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 class MySQLAuthDaoTest {
     private MySQLAuthDao authDao;
@@ -33,6 +32,27 @@ class MySQLAuthDaoTest {
 
         AuthData duplicate = new AuthData("fakeToken", "steven");
         assertThrows(DataAccessException.class, () -> authDao.createAuth(duplicate));
+    }
+
+    @Test
+    @DisplayName("Successful query")
+    void goodGetAuth() throws DataAccessException {
+        AuthData auth = new AuthData("fakeToken", "gurt");
+        authDao.createAuth(auth);
+
+        AuthData result = assertDoesNotThrow(() -> authDao.getAuth("fakeToken"));
+
+        assertNotNull(result);
+        assertEquals("fakeToken", result.authToken());
+        assertEquals("gurt", result.username());
+    }
+
+    @Test
+    @DisplayName("Search invalid authToken")
+    void badGetAuth() throws DataAccessException {
+        AuthData result = authDao.getAuth("invalidToken");
+
+        assertNull(result);
     }
 
 
