@@ -6,6 +6,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class MySQLGameDaoTests {
@@ -58,5 +61,27 @@ class MySQLGameDaoTests {
     void badGetGame() throws DataAccessException {
         GameData result = gameDao.getGame(67);
         assertNull(result);
+    }
+
+    @Test
+    @DisplayName("Valid list games")
+    void goodListGame() throws DataAccessException {
+        Collection<GameData> expected = new ArrayList<>();
+
+        expected.add(gameDao.createGame(new GameData(0, "luffy", "blackbeard", "game1", new ChessGame())));
+        expected.add(gameDao.createGame(new GameData(0, "nami", "arlong", "game2", new ChessGame())));
+        expected.add(gameDao.createGame(new GameData(0, "zoro", "mihawk", "game3", new ChessGame())));
+
+        Collection<GameData> actual = gameDao.listGames();
+
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    @DisplayName("List with no games")
+    void badListGame() throws DataAccessException {
+        Collection<GameData> result = gameDao.listGames();
+        assertTrue(result.isEmpty());
     }
 }

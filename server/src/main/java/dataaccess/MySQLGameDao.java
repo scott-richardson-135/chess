@@ -8,6 +8,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class MySQLGameDao implements GameDao {
@@ -45,8 +46,23 @@ public class MySQLGameDao implements GameDao {
     }
 
     @Override
-    public Collection<GameData> listGames() {
-        return null;
+    public Collection<GameData> listGames() throws DataAccessException {
+        Collection<GameData> result = new ArrayList<>();
+
+        try (Connection conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT * FROM games";
+            try (PreparedStatement ps = conn.prepareStatement(statement)) {
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        result.add(readGame(rs));
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("Unable to get game: " + e.getMessage(), e);
+        }
+
+        return result;
     }
 
     @Override
