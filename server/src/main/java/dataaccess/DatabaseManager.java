@@ -47,6 +47,15 @@ public class DatabaseManager {
                     password VARCHAR(255) NOT NULL,
                     email VARCHAR(255)
                 )
+                """,
+                """
+                CREATE TABLE IF NOT EXISTS games (
+                    gameId INTEGER PRIMARY KEY AUTO_INCREMENT,
+                    whiteUsername VARCHAR(255),
+                    blackUsername VARCHAR(255),
+                    gameName VARCHAR(255) NOT NULL,
+                    game TEXT
+                )
                 """
             };
 

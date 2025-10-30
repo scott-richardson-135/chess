@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
@@ -39,7 +40,7 @@ public class GameService {
 
         checkAuth(request.authToken());
 
-        GameData newGame = new GameData(0, null, null, request.gameName(), null);
+        GameData newGame = new GameData(0, null, null, request.gameName(), new ChessGame());
 
         GameData storedGame = GAME_DAO.createGame(newGame);
 

@@ -8,6 +8,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public class MySQLUserDao implements UserDao {
+
+    public MySQLUserDao() throws DataAccessException {
+        DatabaseManager.configureDatabase();
+    }
+
     @Override
     public void createUser(UserData user) throws DataAccessException {
         var statement = "INSERT INTO users (username, password, email) VALUES (?, ?, ?)";
