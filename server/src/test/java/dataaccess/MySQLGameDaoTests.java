@@ -84,4 +84,31 @@ class MySQLGameDaoTests {
         Collection<GameData> result = gameDao.listGames();
         assertTrue(result.isEmpty());
     }
+
+    @Test
+    @DisplayName("Successful update")
+    void goodUpdateGame() throws DataAccessException {
+        GameData game = new GameData(0, "frodo", "sauron", "ringWar", new ChessGame());
+        GameData createdGame = gameDao.createGame(game);
+
+        GameData updatedGame = new GameData(createdGame.gameID(), "frodo+sam", "sauron+saruman", "ringWar", new ChessGame());
+
+        assertDoesNotThrow(() -> gameDao.updateGame(updatedGame));
+
+        GameData result = gameDao.getGame(updatedGame.gameID());
+
+        assertNotNull(result);
+        assertEquals("frodo+sam", result.whiteUsername());
+        assertEquals("sauron+saruman", result.blackUsername());
+        assertEquals("ringWar", result.gameName());
+        assertEquals(updatedGame.game(), result.game());
+
+    }
+
+    @Test
+    @DisplayName("Unsuccessful update")
+    void badUpdateGame() {
+        GameData invalidGame = new GameData(67, "nobody", "loser", "fools_errand", new ChessGame());
+        assertThrows(DataAccessException.class, () -> gameDao.updateGame(invalidGame));
+    }
 }

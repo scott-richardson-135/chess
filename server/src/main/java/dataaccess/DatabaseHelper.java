@@ -26,14 +26,19 @@ public class DatabaseHelper {
                     }
 
                 }
-                ps.executeUpdate();
+                int rowsEffected = ps.executeUpdate();
 
-                ResultSet rs = ps.getGeneratedKeys();
-                if (rs.next()) {
-                    return rs.getInt(1);
+
+                //only return generated keys if this is an insert
+                if (statement.trim().toUpperCase().startsWith("INSERT")) {
+                    ResultSet rs = ps.getGeneratedKeys();
+                    if (rs.next()) {
+                        return rs.getInt(1);
+                    }
                 }
 
-                return 0;
+                //return number of rows changed for update
+                return rowsEffected;
             }
         } catch (SQLException e) {
             throw new DataAccessException("Unable to update database: " + e.getMessage(), e);

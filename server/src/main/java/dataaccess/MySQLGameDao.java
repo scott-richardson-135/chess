@@ -66,8 +66,24 @@ public class MySQLGameDao implements GameDao {
     }
 
     @Override
-    public void updateGame(GameData game) {
-        //
+    public void updateGame(GameData game) throws DataAccessException {
+        var statement = """
+                UPDATE games
+                SET whiteUsername = ?,
+                    blackUsername = ?,
+                    gameName = ?,
+                    game = ?
+                WHERE gameId = ?
+                """;
+
+        String gameJson = new Gson().toJson(game.game());
+
+        int rowsUpdated = DatabaseHelper.executeUpdate(statement, game.whiteUsername(), game.blackUsername(),
+                game.gameName(), gameJson, game.gameID());
+
+        if (rowsUpdated == 0) {
+            throw new DataAccessException("Game not found");
+        }
     }
 
     @Override
