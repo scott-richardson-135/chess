@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -96,6 +97,12 @@ class MySQLAuthDaoTest {
         assertDoesNotThrow(() -> authDao.clear());
 
         //maybe further testing for an empty table after get is implemented
+    }
+
+    @AfterAll
+    static void teardown() throws DataAccessException {
+        var gameDao = new MySQLAuthDao();
+        gameDao.clear();
     }
 
 }

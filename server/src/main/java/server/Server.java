@@ -14,6 +14,8 @@ public class Server {
     private static final Gson SERIALIZER = new Gson();
 
     public Server() {
+
+
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.

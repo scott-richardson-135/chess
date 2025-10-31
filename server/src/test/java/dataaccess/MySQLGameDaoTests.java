@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.GameData;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -110,5 +111,11 @@ class MySQLGameDaoTests {
     void badUpdateGame() {
         GameData invalidGame = new GameData(67, "nobody", "loser", "fools_errand", new ChessGame());
         assertThrows(DataAccessException.class, () -> gameDao.updateGame(invalidGame));
+    }
+
+    @AfterAll
+    static void teardown() throws DataAccessException {
+        var gameDao = new MySQLGameDao();
+        gameDao.clear();
     }
 }

@@ -17,8 +17,19 @@ import service.exceptions.UnauthorizedException;
 import java.util.Collection;
 
 public class GameService {
-    private static final GameDao GAME_DAO = new MemoryGameDao();
-    private static final AuthDao AUTH_DAO = new MemoryAuthDao();
+    private final GameDao GAME_DAO;
+    private final AuthDao AUTH_DAO;
+
+
+    public GameService() {
+        try {
+            this.GAME_DAO = new MySQLGameDao();
+            this.AUTH_DAO = new MySQLAuthDao();
+
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Failed to initialize DAOs", e);
+        }
+    }
 
     public ListResult list(ListRequest request) throws UnauthorizedException, BadRequestException, DataAccessException {
         if (request.authToken() == null || request.authToken().isEmpty()) {

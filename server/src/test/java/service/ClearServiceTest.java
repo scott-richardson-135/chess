@@ -12,40 +12,40 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ClearServiceTest {
-    private UserDao userDao;
-    private AuthDao authDao;
-    private GameDao gameDao;
+    private UserDao USER_DAO;
+    private AuthDao AUTH_DAO;
+    private GameDao GAME_DAO;
     private ClearService clearService;
 
     @BeforeEach
     public void setUp() throws DataAccessException {
         // initialize DAOs (these might be static or mock in-memory)
-        userDao = new MemoryUserDao();
-        authDao = new MemoryAuthDao();
-        gameDao = new MemoryGameDao();
+        USER_DAO = new MySQLUserDao();
+        AUTH_DAO = new MySQLAuthDao();
+        GAME_DAO = new MySQLGameDao();
         clearService = new ClearService();
 
         // Add sample data
-        userDao.createUser(new UserData("username", "password", "email"));
-        authDao.createAuth(new AuthData("authtoken", "username"));
-        gameDao.createGame(new GameData(1, "wUsername", "bUsername", null, new ChessGame()));
+        USER_DAO.createUser(new UserData("username", "password", "email"));
+        AUTH_DAO.createAuth(new AuthData("authtoken", "username"));
+        GAME_DAO.createGame(new GameData(1, "wUsername", "bUsername", "gameName", new ChessGame()));
     }
 
 
     @Test
     @DisplayName("Clear Test")
     public void clearTest() throws DataAccessException {
-        assertNotNull(userDao.getUser("username"));
-        assertNotNull(authDao.getAuth("authtoken"));
-        assertNotNull(gameDao.getGame(1));
+        assertNotNull(USER_DAO.getUser("username"));
+        assertNotNull(AUTH_DAO.getAuth("authtoken"));
+        assertNotNull(GAME_DAO.getGame(1));
 
         // Call clear()
         assertDoesNotThrow(() -> clearService.clear());
 
         // Verify all data is gone
-        assertNull(userDao.getUser("username"));
-        assertNull(authDao.getAuth("authtoken"));
-        assertNull(gameDao.getGame(1));
+        assertNull(USER_DAO.getUser("username"));
+        assertNull(AUTH_DAO.getAuth("authtoken"));
+        assertNull(GAME_DAO.getGame(1));
 
     }
 

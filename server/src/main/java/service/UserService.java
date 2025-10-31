@@ -18,8 +18,20 @@ import java.util.UUID;
 
 public class UserService {
 
-    private static final UserDao USER_DAO = new MemoryUserDao();
-    private static final AuthDao AUTH_DAO = new MemoryAuthDao();
+    private final UserDao USER_DAO;
+    private final AuthDao AUTH_DAO;
+
+    public UserService() {
+        try {
+            this.USER_DAO = new MySQLUserDao();
+            this.AUTH_DAO = new MySQLAuthDao();
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Failed to initialize DAOs", e);
+        }
+
+    }
+
+
 
     public RegisterResult register(RegisterRequest request) throws BadRequestException, AlreadyTakenException, DataAccessException {
         //do logic for registering using model and dao classes

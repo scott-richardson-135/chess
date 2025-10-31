@@ -2,7 +2,7 @@ package service;
 
 import dataaccess.DataAccessException;
 import dataaccess.GameDao;
-import dataaccess.MemoryGameDao;
+import dataaccess.MySQLGameDao;
 import model.GameData;
 import model.requests.CreateRequest;
 import model.requests.JoinRequest;
@@ -24,7 +24,14 @@ import static org.junit.jupiter.api.Assertions.*;
 class GameServiceTests {
     private static final GameService GAME_SERVICE = new GameService();
     private static final UserService USER_SERVICE = new UserService();
-    private GameDao gameDao = new MemoryGameDao();
+    private GameDao GAME_DAO;
+    GameServiceTests() {
+        try {
+            this.GAME_DAO = new MySQLGameDao();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @BeforeEach
     public void setup() {
@@ -102,7 +109,7 @@ class GameServiceTests {
 
         assertNotNull(joinRequest);
 
-        GameData game = gameDao.getGame(createResult.gameID());
+        GameData game = GAME_DAO.getGame(createResult.gameID());
         assertNotNull(game);
 
         assertEquals("username", game.whiteUsername());

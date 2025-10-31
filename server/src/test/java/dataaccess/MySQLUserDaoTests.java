@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.UserData;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -65,6 +66,12 @@ class MySQLUserDaoTests {
 
         assertDoesNotThrow(() -> userDao.clear());
 
+    }
+
+    @AfterAll
+    static void teardown() throws DataAccessException {
+        var gameDao = new MySQLUserDao();
+        gameDao.clear();
     }
 
 
