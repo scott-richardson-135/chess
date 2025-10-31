@@ -1,6 +1,9 @@
 package dataaccess;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
+import chess.InvalidMoveException;
 import model.GameData;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -111,6 +114,41 @@ class MySQLGameDaoTests {
     void badUpdateGame() {
         GameData invalidGame = new GameData(67, "nobody", "loser", "fools_errand", new ChessGame());
         assertThrows(DataAccessException.class, () -> gameDao.updateGame(invalidGame));
+    }
+
+    @Test
+    @DisplayName("Change to game object persists")
+    void gameUpdateMove() throws DataAccessException, InvalidMoveException {
+        ChessGame gameBoard = new ChessGame();
+        GameData original = new GameData(0, "scott", "emily", "my-game", gameBoard);
+        GameData createdGame = gameDao.createGame(original);
+
+        assertTrue(createdGame.gameID() > 0);
+
+        ChessMove move = new ChessMove(new ChessPosition(2, 2), new ChessPosition(4, 2), null);
+
+        gameBoard.makeMove(move);
+
+        GameData updated = new GameData(createdGame.gameID(), "scott", "emily", "my-game", gameBoard);
+        gameDao.updateGame(updated);
+
+
+        GameData result = gameDao.getGame(createdGame.gameID());
+        assertNotNull(result);
+        assertEquals("scott", result.whiteUsername());
+        assertEquals("emily", result.blackUsername());
+        assertEquals("my-game", result.gameName());
+        assertEquals(gameBoard, result.game());
+    }
+
+
+    @Test
+    @DisplayName("Successful clear")
+    void goodClear() throws DataAccessException {
+        GameData game = new GameData(0, "timmy", "joe", "lalala", new ChessGame());
+        gameDao.createGame(game);
+
+        assertDoesNotThrow(() -> gameDao.clear());
     }
 
     @AfterAll
