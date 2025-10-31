@@ -24,10 +24,11 @@ import static org.junit.jupiter.api.Assertions.*;
 class GameServiceTests {
     private static final GameService GAME_SERVICE = new GameService();
     private static final UserService USER_SERVICE = new UserService();
-    private GameDao GAME_DAO;
+    private final GameDao gameDao;
+
     GameServiceTests() {
         try {
-            this.GAME_DAO = new MySQLGameDao();
+            this.gameDao = new MySQLGameDao();
         } catch (DataAccessException e) {
             throw new RuntimeException(e);
         }
@@ -109,7 +110,7 @@ class GameServiceTests {
 
         assertNotNull(joinRequest);
 
-        GameData game = GAME_DAO.getGame(createResult.gameID());
+        GameData game = gameDao.getGame(createResult.gameID());
         assertNotNull(game);
 
         assertEquals("username", game.whiteUsername());
