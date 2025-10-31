@@ -17,14 +17,14 @@ import service.exceptions.UnauthorizedException;
 import java.util.Collection;
 
 public class GameService {
-    private final GameDao GAME_DAO;
-    private final AuthDao AUTH_DAO;
+    private final GameDao gameDao;
+    private final AuthDao authDao;
 
 
     public GameService() {
         try {
-            this.GAME_DAO = new MySQLGameDao();
-            this.AUTH_DAO = new MySQLAuthDao();
+            this.gameDao = new MySQLGameDao();
+            this.authDao = new MySQLAuthDao();
 
         } catch (DataAccessException e) {
             throw new RuntimeException("Failed to initialize DAOs", e);
@@ -38,7 +38,7 @@ public class GameService {
 
         checkAuth(request.authToken());
 
-        Collection<GameData> games = GAME_DAO.listGames();
+        Collection<GameData> games = gameDao.listGames();
 
         return new ListResult(games);
     }
@@ -53,7 +53,7 @@ public class GameService {
 
         GameData newGame = new GameData(0, null, null, request.gameName(), new ChessGame());
 
-        GameData storedGame = GAME_DAO.createGame(newGame);
+        GameData storedGame = gameDao.createGame(newGame);
 
 
         return new CreateResult(storedGame.gameID());
@@ -66,11 +66,11 @@ public class GameService {
         }
 
         checkAuth(request.authToken());
-        AuthData token = AUTH_DAO.getAuth(request.authToken());
+        AuthData token = authDao.getAuth(request.authToken());
         String username = token.username();
 
 
-        GameData requestedGame = GAME_DAO.getGame(request.iD());
+        GameData requestedGame = gameDao.getGame(request.iD());
         if (requestedGame == null) {
             throw new BadRequestException("game does not exist");
         }
@@ -111,13 +111,13 @@ public class GameService {
             throw new BadRequestException("invalid color");
         }
 
-        GAME_DAO.updateGame(requestedGame);
+        gameDao.updateGame(requestedGame);
 
         return new JoinResult();
     }
 
     private void checkAuth(String authToken) throws UnauthorizedException, DataAccessException {
-        AuthData token = AUTH_DAO.getAuth(authToken);
+        AuthData token = authDao.getAuth(authToken);
 
         if (token == null) {
             throw new UnauthorizedException("invalid authtoken");

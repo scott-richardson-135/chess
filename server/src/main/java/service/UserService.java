@@ -18,13 +18,13 @@ import java.util.UUID;
 
 public class UserService {
 
-    private final UserDao USER_DAO;
-    private final AuthDao AUTH_DAO;
+    private final UserDao userDao;
+    private final AuthDao authDao;
 
     public UserService() {
         try {
-            this.USER_DAO = new MySQLUserDao();
-            this.AUTH_DAO = new MySQLAuthDao();
+            this.userDao = new MySQLUserDao();
+            this.authDao = new MySQLAuthDao();
         } catch (DataAccessException e) {
             throw new RuntimeException("Failed to initialize DAOs", e);
         }
@@ -43,19 +43,19 @@ public class UserService {
         }
 
         //check if already taken
-        if (USER_DAO.getUser(request.username()) != null) {
+        if (userDao.getUser(request.username()) != null) {
             throw new AlreadyTakenException("user already taken");
         }
 
         //create user with Dao
         String hashedPassword = BCrypt.hashpw(request.password(), BCrypt.gensalt());
         UserData newUser = new UserData(request.username(), hashedPassword, request.email());
-        USER_DAO.createUser(newUser);
+        userDao.createUser(newUser);
 
         //create authtoken
         String authToken = UUID.randomUUID().toString();
         AuthData authData = new AuthData(authToken, request.username());
-        AUTH_DAO.createAuth(authData);
+        authDao.createAuth(authData);
 
         return new RegisterResult(request.username(), authToken);
     }
@@ -67,7 +67,7 @@ public class UserService {
         }
 
         //find user by username, check if valid
-        UserData user = USER_DAO.getUser(request.username());
+        UserData user = userDao.getUser(request.username());
         if (user == null || !BCrypt.checkpw(request.password(), user.password())) {
             throw new UnauthorizedException("invalid username or password");
         }
@@ -75,7 +75,7 @@ public class UserService {
         //create authToken
         String authToken = UUID.randomUUID().toString();
         AuthData authData = new AuthData(authToken, request.username());
-        AUTH_DAO.createAuth(authData);
+        authDao.createAuth(authData);
 
         return new LoginResult(request.username(), authToken);
     }
@@ -86,14 +86,14 @@ public class UserService {
         }
 
         //find AuthData by authtoken
-        AuthData token = AUTH_DAO.getAuth(request.authToken());
+        AuthData token = authDao.getAuth(request.authToken());
 
         if (token == null) {
             throw new UnauthorizedException("invalid authtoken");
         }
 
         //delete authtoken
-        AUTH_DAO.deleteAuth(request.authToken());
+        authDao.deleteAuth(request.authToken());
 
         return new LogoutResult();
     }

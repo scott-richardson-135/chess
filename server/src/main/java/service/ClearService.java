@@ -3,15 +3,15 @@ package service;
 import dataaccess.*;
 
 public class ClearService {
-    private final UserDao USER_DAO;
-    private final AuthDao AUTH_DAO;
-    private final GameDao GAME_DAO;
+    private final UserDao userDao;
+    private final AuthDao authDao;
+    private final GameDao gameDao;
 
     public ClearService() {
         try {
-            this.USER_DAO = new MySQLUserDao();
-            this.AUTH_DAO = new MySQLAuthDao();
-            this.GAME_DAO = new MySQLGameDao();
+            this.userDao = new MySQLUserDao();
+            this.authDao = new MySQLAuthDao();
+            this.gameDao = new MySQLGameDao();
         } catch (DataAccessException e) {
             throw new RuntimeException("Failed to initialize DAOs", e);
         }
@@ -21,9 +21,9 @@ public class ClearService {
 
     public void clear() {
         try {
-            USER_DAO.clear();
-            AUTH_DAO.clear();
-            GAME_DAO.clear();
+            userDao.clear();
+            authDao.clear();
+            gameDao.clear();
         } catch (DataAccessException e) {
             throw new RuntimeException("Database Clear Failed", e);
         }
