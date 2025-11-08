@@ -76,4 +76,20 @@ public class ServerFacadeTests {
         assertThrows(ResponseException.class, () -> facade.login(request));
     }
 
+    @Test
+    @DisplayName("Server Facade valid logout")
+    public void goodLogoutFacade() throws ResponseException {
+        UserData user = new UserData("luka", "676767", "luka@gmail.com");
+        AuthData auth = facade.register(user);
+
+        assertDoesNotThrow(() -> facade.logout(auth.authToken()));
+
+    }
+
+    @Test
+    @DisplayName("Server Facade bad logout")
+    public void badLogoutFacade() {
+        assertThrows(ResponseException.class, () -> facade.logout("fakeToken"));
+    }
+
 }

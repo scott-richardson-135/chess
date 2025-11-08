@@ -30,6 +30,12 @@ public class ServerFacade {
         return handleResponse(response, AuthData.class);
     }
 
+    public void logout(String authToken) throws ResponseException {
+        var request = buildRequest("DELETE", "/session", null, authToken);
+        var response = sendRequest(request);
+        handleResponse(response, null);
+    }
+
     public void clear() throws ResponseException {
         var request = buildRequest("DELETE", "/db", null, null);
         var response = sendRequest(request);
