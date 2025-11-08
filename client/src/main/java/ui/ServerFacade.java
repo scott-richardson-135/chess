@@ -3,6 +3,7 @@ package ui;
 import com.google.gson.Gson;
 import model.AuthData;
 import model.UserData;
+import model.requests.LoginRequest;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -19,6 +20,12 @@ public class ServerFacade {
 
     public AuthData register(UserData user) throws ResponseException {
         var request = buildRequest("POST", "/user", user, null);
+        var response = sendRequest(request);
+        return handleResponse(response, AuthData.class);
+    }
+
+    public AuthData login(LoginRequest reqBody) throws ResponseException {
+        var request = buildRequest("POST", "/session", reqBody, null);
         var response = sendRequest(request);
         return handleResponse(response, AuthData.class);
     }

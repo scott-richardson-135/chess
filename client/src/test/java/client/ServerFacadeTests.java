@@ -2,6 +2,7 @@ package client;
 
 import model.AuthData;
 import model.UserData;
+import model.requests.LoginRequest;
 import org.junit.jupiter.api.*;
 import server.Server;
 import ui.ResponseException;
@@ -52,6 +53,27 @@ public class ServerFacadeTests {
         UserData badUser = new UserData(null, null, null);
 
         assertThrows(ResponseException.class, () -> facade.register(badUser));
+    }
+
+    @Test
+    @DisplayName("Server Facade valid login")
+    public void goodLoginFacade() throws ResponseException {
+        UserData user = new UserData("Steve", "herobrine", "steve@gmail.com");
+        facade.register(user);
+
+        LoginRequest request = new LoginRequest("Steve", "herobrine");
+
+        AuthData auth = assertDoesNotThrow(() -> facade.login(request));
+        assertNotNull(auth);
+        assertNotNull(auth.authToken());
+        assertEquals("Steve", auth.username());
+    }
+
+    @Test
+    @DisplayName("Server Facade bad login")
+    public void badLoginFacade() {
+        LoginRequest request = new LoginRequest("fakeUser", "fakePassword");
+        assertThrows(ResponseException.class, () -> facade.login(request));
     }
 
 }
