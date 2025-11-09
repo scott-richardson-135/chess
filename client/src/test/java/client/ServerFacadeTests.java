@@ -126,12 +126,38 @@ public class ServerFacadeTests {
         Collection<GameData> games = assertDoesNotThrow(() -> facade.list(authToken));
 
         assertNotNull(games);
+        assertEquals(2, games.size());
     }
 
     @Test
     @DisplayName("Server Facade bad list")
     public void badListFacade() {
         assertThrows(ResponseException.class, () -> facade.list("fakeToken"));
+    }
+
+    @Test
+    @DisplayName("Server Facade good join")
+    public void goodJoinFacade() throws ResponseException {
+        UserData user = new UserData("lebron", "legoat", "lb@gmail.com");
+        AuthData auth = facade.register(user);
+        String authToken = auth.authToken();
+
+        int gameId = facade.create(authToken, "2016finals");
+
+        assertDoesNotThrow(() -> facade.join(authToken, gameId, "WHITE"));
+
+        Collection<GameData> games = facade.list(authToken);
+        GameData game = games.stream().findFirst().get();
+
+        assertEquals("lebron", game.whiteUsername());
+        assertNull(game.blackUsername());
+        assertNotNull(game.game());
+    }
+
+    @Test
+    @DisplayName("Server Facade bad join")
+    public void badJoinFacade() {
+        assertThrows(ResponseException.class, () -> facade.join("fakeToken", 0, "FAKE"));
     }
 
 }

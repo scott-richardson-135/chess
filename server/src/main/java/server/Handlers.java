@@ -109,7 +109,7 @@ public class Handlers {
             String authToken = getAuthToken(ctx);
             JoinBody body = SERIALIZER.fromJson(ctx.body(), JoinBody.class);
             if (body == null || body.playerColor() == null || body.playerColor().isEmpty() || body.gameID() == null) {
-                throw new BadRequestException("bad request");
+                throw new BadRequestException("handler bad request");
             }
 
             JoinRequest request = new JoinRequest(authToken, body.playerColor(), body.gameID());

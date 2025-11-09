@@ -5,6 +5,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import model.requests.CreateRequest;
+import model.requests.JoinBody;
 import model.requests.LoginRequest;
 import model.results.CreateResult;
 import model.results.ListResult;
@@ -55,6 +56,14 @@ public class ServerFacade {
         var response = sendRequest(request);
         CreateResult result =  handleResponse(response, CreateResult.class);
         return result.gameID();
+    }
+
+    public void join(String authToken, int gameId, String playerColor) throws ResponseException {
+        JoinBody reqBody = new JoinBody(playerColor, gameId);
+
+        var request = buildRequest("PUT", "/game", reqBody, authToken);
+        var response = sendRequest(request);
+        handleResponse(response, null);
     }
 
     public void clear() throws ResponseException {
