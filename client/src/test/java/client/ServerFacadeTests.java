@@ -1,12 +1,18 @@
 package client;
 
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import model.requests.LoginRequest;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import server.Server;
 import ui.ResponseException;
 import ui.ServerFacade;
+
+import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -30,11 +36,6 @@ public class ServerFacadeTests {
         server.stop();
     }
 
-
-    @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
-    }
 
     @Test
     @DisplayName("Server Facade valid register")
@@ -90,6 +91,47 @@ public class ServerFacadeTests {
     @DisplayName("Server Facade bad logout")
     public void badLogoutFacade() {
         assertThrows(ResponseException.class, () -> facade.logout("fakeToken"));
+    }
+
+    @Test
+    @DisplayName("Server Facade valid create")
+    public void goodCreateFacade() throws ResponseException {
+        UserData user = new UserData("Michael", "blink182", "mikey@gmail.com");
+        AuthData auth = facade.register(user);
+
+        String authToken = auth.authToken();
+
+        int gameId = assertDoesNotThrow(() -> facade.create(authToken, "testGame"));
+
+        assertTrue(gameId > 0);
+    }
+
+    @Test
+    @DisplayName("Server Facade bad create")
+    public void badCreateFacade() {
+        assertThrows(ResponseException.class, () -> facade.create("fakeToken", "badGame"));
+    }
+
+    @Test
+    @DisplayName("Server Facade valid list")
+    public void goodListFacade() throws ResponseException {
+        UserData user = new UserData("benny", "5678987", "benj@gmail.com");
+        AuthData auth = facade.register(user);
+
+        String authToken = auth.authToken();
+
+        facade.create(authToken, "testGame1");
+        facade.create(authToken, "testGame2");
+
+        Collection<GameData> games = assertDoesNotThrow(() -> facade.list(authToken));
+
+        assertNotNull(games);
+    }
+
+    @Test
+    @DisplayName("Server Facade bad list")
+    public void badListFacade() {
+        assertThrows(ResponseException.class, () -> facade.list("fakeToken"));
     }
 
 }

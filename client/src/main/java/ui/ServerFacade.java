@@ -2,13 +2,18 @@ package ui;
 
 import com.google.gson.Gson;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
+import model.requests.CreateRequest;
 import model.requests.LoginRequest;
+import model.results.CreateResult;
+import model.results.ListResult;
 
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.Collection;
 
 public class ServerFacade {
     private final HttpClient client = HttpClient.newHttpClient();
@@ -34,6 +39,22 @@ public class ServerFacade {
         var request = buildRequest("DELETE", "/session", null, authToken);
         var response = sendRequest(request);
         handleResponse(response, null);
+    }
+
+    public Collection<GameData> list(String authToken) throws ResponseException {
+        var request = buildRequest("GET", "/game", null, authToken);
+        var response = sendRequest(request);
+        ListResult result =  handleResponse(response, ListResult.class);
+        return result.games();
+    }
+
+    public int create(String authToken, String gameName) throws ResponseException {
+        CreateRequest reqBody = new CreateRequest(authToken, gameName);
+
+        var request = buildRequest("POST", "/game", reqBody, authToken);
+        var response = sendRequest(request);
+        CreateResult result =  handleResponse(response, CreateResult.class);
+        return result.gameID();
     }
 
     public void clear() throws ResponseException {
