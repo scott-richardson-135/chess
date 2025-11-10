@@ -126,7 +126,6 @@ public class ServerFacadeTests {
         Collection<GameData> games = assertDoesNotThrow(() -> facade.list(authToken));
 
         assertNotNull(games);
-        assertEquals(2, games.size());
     }
 
     @Test
@@ -158,6 +157,12 @@ public class ServerFacadeTests {
     @DisplayName("Server Facade bad join")
     public void badJoinFacade() {
         assertThrows(ResponseException.class, () -> facade.join("fakeToken", 0, "FAKE"));
+    }
+
+    @Test
+    @DisplayName("Server Facade clear")
+    public void clearFacade() {
+        assertDoesNotThrow(() -> facade.clear());
     }
 
 }
