@@ -1,12 +1,18 @@
 package ui;
 
 import model.AuthData;
+import model.GameData;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class SignedInRepl {
     ServerFacade server;
     AuthData auth;
+
+    private final HashMap<Integer, Integer> gameNumberToId = new HashMap<>();
 
     SignedInRepl(ServerFacade server, AuthData auth) {
         this.server = server;
@@ -35,6 +41,7 @@ public class SignedInRepl {
 
                 }
                 case "3", "create game" -> createGame(scanner);
+                case "4", "list games" -> listGames();
 
                 default -> System.out.println("Invalid command. Type 'help' for help.");
             }
@@ -60,15 +67,45 @@ public class SignedInRepl {
 
     private void createGame(Scanner scanner) {
         try {
-            System.out.println("Game Name: ");
+            System.out.print("Game Name: ");
             String gameName = scanner.nextLine();
             server.create(auth.authToken(), gameName);
             System.out.println("Game created");
         } catch (ResponseException e) {
             System.out.println("Failed to create game: " + e.getMessage());
         }
+    }
+
+    private void listGames() {
+        Collection<GameData> games = new ArrayList<>();
+        gameNumberToId.clear();
+        try {
+            games = server.list(auth.authToken());
+        } catch (ResponseException e) {
+            System.out.println("Failed to list games: " + e.getMessage());
+        }
+
+
+        if (games.isEmpty()) {
+            System.out.println("No games found");
+            return;
+        }
+
+        int index = 1;
+        System.out.println("Games: ");
+        for (GameData game : games) {
+            gameNumberToId.put(index, game.gameID());
+            String white = (game.whiteUsername() != null) ? game.whiteUsername() : "---";
+            String black = (game.blackUsername() != null) ? game.blackUsername() : "---";
+
+            System.out.printf("%d. %s- White: %s, Black: %s\n", index, game.gameName(), white, black);
+            index++;
+        }
+
 
     }
+
+
 
 
 
