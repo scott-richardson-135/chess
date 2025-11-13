@@ -35,6 +35,7 @@ public class SignedOutRepl {
                     AuthData auth = register(scanner);
                     if (auth != null) {
                         System.out.println("Logged in as " + auth.username());
+                        new SignedInRepl(server, auth).run();
                     }
                 }
                 case "4", "quit" -> {

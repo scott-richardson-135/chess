@@ -4,10 +4,7 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 import model.requests.LoginRequest;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import server.Server;
 import ui.ResponseException;
 import ui.ServerFacade;
@@ -28,6 +25,11 @@ public class ServerFacadeTests {
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
         facade = new ServerFacade("http://localhost:" + port);
+        facade.clear();
+    }
+
+    @BeforeEach
+    public void clear() throws ResponseException {
         facade.clear();
     }
 

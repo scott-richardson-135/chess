@@ -43,6 +43,7 @@ public class SignedInRepl {
                 case "3", "create game" -> createGame(scanner);
                 case "4", "list games" -> listGames();
                 case "5", "join game" -> joinGame(scanner);
+                case "6", "observe game" -> observeGame(scanner);
 
                 default -> System.out.println("Invalid command. Type 'help' for help.");
             }
@@ -136,8 +137,21 @@ public class SignedInRepl {
         } catch (ResponseException e) {
             System.out.println("Failed to join game: " + e.getMessage());
         }
+    }
 
+    private void observeGame(Scanner scanner) {
+        System.out.print("Enter game number to join: ");
+        int gameNumber = Integer.parseInt(scanner.nextLine());
+        Integer gameId = gameNumberToId.get(gameNumber);
 
+        if (gameId == null) {
+            System.out.println("Invalid game number");
+            return;
+        }
+
+        System.out.printf("Observing game %d", gameNumber);
+
+        //TODO render board here too probably
     }
 
 
