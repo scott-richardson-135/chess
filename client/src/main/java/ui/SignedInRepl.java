@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 
@@ -133,6 +134,9 @@ public class SignedInRepl {
             System.out.printf("Joined game %d as %s\n", gameNumber, colorString.toLowerCase());
 
             //TODO This is where the board is rendered
+            boolean isWhite = colorString.equals("WHITE");
+            ChessGame game = new ChessGame();
+            BoardDrawer.drawBoard(game, isWhite);
 
         } catch (ResponseException e) {
             System.out.println("Failed to join game: " + e.getMessage());
@@ -149,9 +153,13 @@ public class SignedInRepl {
             return;
         }
 
-        System.out.printf("Observing game %d", gameNumber);
+        System.out.printf("Observing game %d\n", gameNumber);
 
         //TODO render board here too probably
+
+        ChessGame game = new ChessGame();
+        BoardDrawer.drawBoard(game, true);
+
     }
 
 
