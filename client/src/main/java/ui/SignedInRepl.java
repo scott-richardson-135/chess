@@ -42,6 +42,7 @@ public class SignedInRepl {
                 }
                 case "3", "create game" -> createGame(scanner);
                 case "4", "list games" -> listGames();
+                case "5", "join game" -> joinGame(scanner);
 
                 default -> System.out.println("Invalid command. Type 'help' for help.");
             }
@@ -100,6 +101,40 @@ public class SignedInRepl {
 
             System.out.printf("%d. %s- White: %s, Black: %s\n", index, game.gameName(), white, black);
             index++;
+        }
+    }
+
+    private void joinGame(Scanner scanner) {
+        try {
+            System.out.print("Enter game number to join: ");
+            int gameNumber = Integer.parseInt(scanner.nextLine());
+            Integer gameId = gameNumberToId.get(gameNumber);
+
+            if (gameId == null) {
+                System.out.println("Invalid game number");
+                return;
+            }
+
+            System.out.print("Enter 1 for white, 2 for black: ");
+            String colorNumber = scanner.nextLine().trim();
+
+            String colorString = switch (colorNumber) {
+                case "1" -> "WHITE";
+                case "2" -> "BLACK";
+                default -> null;
+            };
+            if (colorString == null) {
+                System.out.println("Invalid color choice");
+                return;
+            }
+
+            server.join(auth.authToken(), gameId, colorString);
+            System.out.printf("Joined game %d as %s\n", gameNumber, colorString.toLowerCase());
+
+            //TODO This is where the board is rendered
+
+        } catch (ResponseException e) {
+            System.out.println("Failed to join game: " + e.getMessage());
         }
 
 
