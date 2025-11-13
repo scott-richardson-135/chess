@@ -28,6 +28,7 @@ public class SignedOutRepl {
                     AuthData auth = login(scanner);
                     if (auth != null) {
                         System.out.println("Logged in as " + auth.username());
+                        new SignedInRepl(server, auth).run();
                     }
                 }
                 case "3", "register" -> {
@@ -55,7 +56,8 @@ public class SignedOutRepl {
     }
 
     private void printHelp() {
-        System.out.println("Very Helpful Message");
+        System.out.println("Enter one of the following commands and follow the prompts: ");
+        printMenu();
     }
 
     private AuthData login(Scanner scanner) {
