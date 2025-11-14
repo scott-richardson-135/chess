@@ -133,7 +133,7 @@ public class SignedInRepl {
             server.join(auth.authToken(), gameId, colorString);
             System.out.printf("Joined game %d as %s\n", gameNumber, colorString.toLowerCase());
 
-            //TODO This is where the board is rendered
+
             boolean isWhite = colorString.equals("WHITE");
             ChessGame game = new ChessGame();
             BoardDrawer.drawBoard(game, isWhite);
@@ -144,7 +144,7 @@ public class SignedInRepl {
     }
 
     private void observeGame(Scanner scanner) {
-        System.out.print("Enter game number to join: ");
+        System.out.print("Enter game number to observe: ");
         int gameNumber = Integer.parseInt(scanner.nextLine());
         Integer gameId = gameNumberToId.get(gameNumber);
 
@@ -155,7 +155,6 @@ public class SignedInRepl {
 
         System.out.printf("Observing game %d\n", gameNumber);
 
-        //TODO render board here too probably
 
         ChessGame game = new ChessGame();
         BoardDrawer.drawBoard(game, true);

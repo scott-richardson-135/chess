@@ -21,9 +21,6 @@ public class ResponseException extends Exception {
         this.code = code;
     }
 
-    public Code code() {
-        return code;
-    }
 
     public static ResponseException fromHttpStatusCode(int statusCode) {
         if (statusCode == 400) {
