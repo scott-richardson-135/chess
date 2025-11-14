@@ -1,5 +1,7 @@
 package ui;
 
+import com.google.gson.Gson;
+
 public class ResponseException extends Exception {
 
     public enum Code {
@@ -43,6 +45,15 @@ public class ResponseException extends Exception {
     }
 
     public static ResponseException fromJson(String body) {
-        return new ResponseException(Code.Other, body);
+        try {
+            Gson gson = new Gson();
+            ErrorResponse error = gson.fromJson(body, ErrorResponse.class);
+            String message = (error != null && error.message != null) ?
+                    error.message : body;
+
+            return new ResponseException(Code.Other, message);
+        } catch (Exception e) {
+            return new ResponseException(Code.Other, body);
+        }
     }
 }
