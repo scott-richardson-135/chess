@@ -40,7 +40,7 @@ public class BoardDrawer {
 
             //draw the squares and pieces for the row
             for (int col : cols) {
-                boolean lightSquare = (row + col) % 2 == 0;
+                boolean lightSquare = (row + col) % 2 == 1;
                 String bgColor = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
                 ChessPiece piece = board.getPiece(new ChessPosition(row, col));
                 String symbol = getSymbol(piece);

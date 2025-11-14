@@ -140,12 +140,20 @@ public class SignedInRepl {
 
         } catch (ResponseException e) {
             System.out.println("Failed to join game: " + e.getMessage());
+        } catch (NumberFormatException e) {
+            System.out.println("Unrecognized game number");
         }
     }
 
     private void observeGame(Scanner scanner) {
         System.out.print("Enter game number to observe: ");
-        int gameNumber = Integer.parseInt(scanner.nextLine());
+        int gameNumber = 0;
+        try {
+            gameNumber = Integer.parseInt(scanner.nextLine());
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid game number");
+            return;
+        }
         Integer gameId = gameNumberToId.get(gameNumber);
 
         if (gameId == null) {
