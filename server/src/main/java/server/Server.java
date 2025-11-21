@@ -7,14 +7,17 @@ import model.results.ErrorResponse;
 import service.exceptions.AlreadyTakenException;
 import service.exceptions.BadRequestException;
 import service.exceptions.UnauthorizedException;
+import websocket.WebSocketHandler;
 
 public class Server {
 
     private final Javalin javalin;
     private static final Gson SERIALIZER = new Gson();
+    private final WebSocketHandler webSocketHandler;
 
     public Server() {
 
+        webSocketHandler = new WebSocketHandler();
 
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
@@ -32,6 +35,12 @@ public class Server {
         javalin.put("/game", new Handlers.JoinHandler());
 
         javalin.delete("/db", new Handlers.ClearHandler());
+
+        javalin.ws("/ws", ws -> {
+            ws.onConnect(webSocketHandler);
+            ws.onMessage(webSocketHandler);
+            ws.onClose(webSocketHandler);
+        });
 
 
 
