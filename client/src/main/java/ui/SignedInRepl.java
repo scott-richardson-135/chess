@@ -1,6 +1,5 @@
 package ui;
 
-import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 
@@ -133,10 +132,9 @@ public class SignedInRepl {
             server.join(auth.authToken(), gameId, colorString);
             System.out.printf("Joined game %d as %s\n", gameNumber, colorString.toLowerCase());
 
-
             boolean isWhite = colorString.equals("WHITE");
-            ChessGame game = new ChessGame();
-            BoardDrawer.drawBoard(game, isWhite);
+            new GameplayRepl(server, auth, gameId, isWhite).run();
+
 
         } catch (ResponseException e) {
             System.out.println("Failed to join game: " + e.getMessage());
@@ -164,8 +162,8 @@ public class SignedInRepl {
         System.out.printf("Observing game %d\n", gameNumber);
 
 
-        ChessGame game = new ChessGame();
-        BoardDrawer.drawBoard(game, true);
+        new GameplayRepl(server, auth, gameId, true).run();
+
 
     }
 
