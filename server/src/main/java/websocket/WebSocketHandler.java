@@ -7,6 +7,7 @@ import org.eclipse.jetty.websocket.api.Session;
 import service.GameService;
 import service.UserService;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 
@@ -28,7 +29,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleMessage(WsMessageContext ctx) {
         //determine message type, call connect, makeMove, leaveGame, or resignGame
-        System.out.println("received message");
 
         try {
             UserGameCommand command = gson.fromJson(ctx.message(), UserGameCommand.class);
@@ -57,8 +57,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             //get game and check if it is real
             GameData game = gameService.getGame(command.getGameID());
             if (game == null) {
-                //sendError(session, "Error: game does not exist");
-                System.out.println("Error: game does not exist");
+                sendError(session, "Error: game does not exist");
                 return;
             }
 
@@ -75,8 +74,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             sessions.broadcast(command.getGameID(), notification, session);
 
         } catch (Exception ex) {
-            //sendError(session, "Error: " + ex.getMessage());
-            System.out.println("Error: " + ex.getMessage());
+            sendError(session, "Error: " + ex.getMessage());
         }
     }
 
@@ -93,5 +91,10 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void handleResign(UserGameCommand command) {
         System.out.println("handling a resign command");
+    }
+
+    private void sendError(Session session, String message) throws IOException {
+        ErrorMessage error = new ErrorMessage(message);
+        session.getRemote().sendString(gson.toJson(error));
     }
 }
