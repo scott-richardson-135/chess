@@ -2,8 +2,12 @@ package websocket;
 
 import com.google.gson.Gson;
 import io.javalin.websocket.*;
+import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
+import service.GameService;
+import service.UserService;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 
 import java.io.IOException;
@@ -12,6 +16,8 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private WebSocketSessions sessions = new WebSocketSessions();
     private final Gson gson = new Gson();
+    private final GameService gameService = new GameService();
+    private final UserService userService = new UserService();
 
     @Override
     public void handleConnect(WsConnectContext ctx) {
@@ -45,10 +51,33 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void handleConnectCommand(UserGameCommand command, Session session) throws IOException {
-        System.out.println("handling a connect command");
-        sessions.addSessionToGame(command.getGameID(), session);
-        var notification = new NotificationMessage("Player joined."); //TODO figure out how to send their name in the notif
-        sessions.broadcast(command.getGameID(), notification, session);
+        try {
+            var username = userService.getUsernameFromToken(command.getAuthToken());
+
+            //get game and check if it is real
+            GameData game = gameService.getGame(command.getGameID());
+            if (game == null) {
+                //sendError(session, "Error: game does not exist");
+                System.out.println("Error: game does not exist");
+                return;
+            }
+
+            sessions.addSessionToGame(command.getGameID(), session);
+
+            //send load game message to root client
+            LoadGameMessage loadGameMessage = new LoadGameMessage(game);
+            session.getRemote().sendString(gson.toJson(loadGameMessage));
+
+            String color = gameService.getPlayerColor(command.getGameID(), username);
+            String role = (color == null) ? "observer" : color;
+
+            NotificationMessage notification = new NotificationMessage(username + " joined as " + role);
+            sessions.broadcast(command.getGameID(), notification, session);
+
+        } catch (Exception ex) {
+            //sendError(session, "Error: " + ex.getMessage());
+            System.out.println("Error: " + ex.getMessage());
+        }
     }
 
     private void handleMakeMove(UserGameCommand command) {

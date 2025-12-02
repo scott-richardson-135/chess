@@ -97,4 +97,15 @@ public class UserService {
 
         return new LogoutResult();
     }
+
+    public String getUsernameFromToken(String authToken) throws UnauthorizedException, DataAccessException {
+        AuthData token = authDao.getAuth(authToken);
+
+        if (token == null) {
+            throw new UnauthorizedException("invalid authtoken");
+        }
+
+        return token.username();
+
+    }
 }

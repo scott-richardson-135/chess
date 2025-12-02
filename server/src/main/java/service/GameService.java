@@ -124,4 +124,19 @@ public class GameService {
         }
 
     }
+
+    public GameData getGame(int gameId) throws DataAccessException {
+        return gameDao.getGame(gameId);
+    }
+
+    public String getPlayerColor(int gameId, String username) throws DataAccessException {
+        GameData game = gameDao.getGame(gameId);
+        if (game == null) {
+            return null;
+        }
+
+        if (username.equals(game.whiteUsername())) return "WHITE";
+        if (username.equals(game.blackUsername())) return "BLACK";
+        return null;
+    }
 }
