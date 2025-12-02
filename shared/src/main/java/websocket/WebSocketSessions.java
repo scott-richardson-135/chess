@@ -1,7 +1,9 @@
 package websocket;
 
+import com.google.gson.Gson;
 import org.eclipse.jetty.websocket.api.Session;
 
+import java.io.IOException;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -29,5 +31,22 @@ public class WebSocketSessions {
 
     public Set<Session> getSessionsForGame(int gameId) {
         return connections.get(gameId);
+    }
+
+    public void broadcast(int gameId, Object message, Session except) throws IOException {
+        Set<Session> sessions = getSessionsForGame(gameId);
+        if (sessions == null) {
+            return;
+        }
+
+        String json = new Gson().toJson(message);
+
+        for (Session session : sessions) {
+            if (session.isOpen()) {
+                if (!session.equals(except)) {
+                    session.getRemote().sendString(json);
+                }
+            }
+        }
     }
 }

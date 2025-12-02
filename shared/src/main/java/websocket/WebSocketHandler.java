@@ -26,9 +26,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             Session session = ctx.session;
 
             switch (command.getCommandType()) {
-                case CONNECT -> handleConnectCommand(command);
+                case CONNECT -> handleConnectCommand(command, session);
                 case MAKE_MOVE -> handleMakeMove(command);
-                case LEAVE -> handleLeave(command);
+                case LEAVE -> handleLeave(command, session);
                 case RESIGN -> handleResign(command);
             }
         } catch (Exception e) {
@@ -41,16 +41,18 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    private void handleConnectCommand(UserGameCommand command) {
+    private void handleConnectCommand(UserGameCommand command, Session session) {
         System.out.println("handling a connect command");
+        sessions.addSessionToGame(command.getGameID(), session);
     }
 
     private void handleMakeMove(UserGameCommand command) {
         System.out.println("handling a make move command");
     }
 
-    private void handleLeave(UserGameCommand command) {
-        System.out.println("handling a leave command");
+    private void handleLeave(UserGameCommand command, Session session) {
+        sessions.removeSessionFromGame(command.getGameID(), session);
+        System.out.println("Player left");
     }
 
     private void handleResign(UserGameCommand command) {
