@@ -52,7 +52,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
     private void handleConnectCommand(UserGameCommand command, Session session) throws IOException {
         try {
-            var username = userService.getUsernameFromToken(command.getAuthToken());
+            String username = userService.getUsernameFromToken(command.getAuthToken());
 
             //get game and check if it is real
             GameData game = gameService.getGame(command.getGameID());
@@ -83,10 +83,23 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void handleLeave(UserGameCommand command, Session session) throws IOException {
-        sessions.removeSessionFromGame(command.getGameID(), session);
-        System.out.println("Player left");
-        var notification = new NotificationMessage("Player left."); //TODO also figure out how to send name
-        sessions.broadcast(command.getGameID(), notification, session);
+        try {
+            String username = userService.getUsernameFromToken(command.getAuthToken());
+
+            GameData game = gameService.getGame(command.getGameID());
+            if (game == null) {
+                sendError(session, "Error: game does not exist");
+                return;
+            }
+
+            sessions.removeSessionFromGame(command.getGameID(), session);
+
+            NotificationMessage notification = new NotificationMessage(username + " left the game");
+            sessions.broadcast(command.getGameID(), notification, session);
+
+        } catch (Exception ex) {
+            sendError(session, "Error: " + ex.getMessage());
+        }
     }
 
     private void handleResign(UserGameCommand command) {
