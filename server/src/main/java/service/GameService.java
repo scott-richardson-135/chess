@@ -139,4 +139,8 @@ public class GameService {
         if (username.equals(game.blackUsername())) return "BLACK";
         return null;
     }
+
+    public void updateGame(GameData game) throws DataAccessException {
+        gameDao.updateGame(game);
+    }
 }

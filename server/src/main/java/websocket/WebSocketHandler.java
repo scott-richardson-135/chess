@@ -1,5 +1,7 @@
 package websocket;
 
+import chess.ChessGame;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import io.javalin.websocket.*;
 import model.GameData;
@@ -20,6 +22,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     private final GameService gameService = new GameService();
     private final UserService userService = new UserService();
 
+
     @Override
     public void handleConnect(WsConnectContext ctx) {
         System.out.println("Websocket connected");
@@ -36,7 +39,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             switch (command.getCommandType()) {
                 case CONNECT -> handleConnectCommand(command, session);
-                case MAKE_MOVE -> handleMakeMove(command);
+                case MAKE_MOVE -> handleMakeMove(command, session);
                 case LEAVE -> handleLeave(command, session);
                 case RESIGN -> handleResign(command);
             }
@@ -78,8 +81,38 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void handleMakeMove(UserGameCommand command) {
+    private void handleMakeMove(UserGameCommand command, Session session) throws IOException {
         System.out.println("handling a make move command");
+
+        try {
+            String username = userService.getUsernameFromToken(command.getAuthToken());
+
+            GameData game = gameService.getGame(command.getGameID());
+            if (game == null) {
+                sendError(session, "Error: game not found");
+            }
+
+            ChessGame chessGame = game.game();
+
+            //try to make the move, and then we'll save it later if it works
+            try {
+                chessGame.makeMove(command.getMove());
+            } catch (InvalidMoveException e) {
+                sendError(session, "Invalid move: " + e.getMessage());
+            }
+
+            GameData updated = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
+            gameService.updateGame(updated);
+
+            LoadGameMessage loadGameMessage = new LoadGameMessage(updated);
+            sessions.broadcast(command.getGameID(), loadGameMessage, null);
+
+            NotificationMessage notification = new NotificationMessage(username + " made a move: " + command.getMove().toString());
+            sessions.broadcast(command.getGameID(), notification, session);
+
+        } catch (Exception ex) {
+            sendError(session, "Error: " + ex.getMessage());
+        }
     }
 
     private void handleLeave(UserGameCommand command, Session session) throws IOException {
