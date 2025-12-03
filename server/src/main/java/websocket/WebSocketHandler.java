@@ -89,6 +89,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             GameData game = gameService.getGame(command.getGameID());
             if (game == null) {
                 sendError(session, "Error: game not found");
+                return;
             }
 
             String color = gameService.getPlayerColor(command.getGameID(), username);
@@ -120,6 +121,27 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             NotificationMessage notification = new NotificationMessage(username + " made a move: " + command.getMove().toString());
             sessions.broadcast(command.getGameID(), notification, session);
+
+            //update game already switches turn, so we check if the player in current turn is in check/mate
+            ChessGame.TeamColor turn = updated.game().getTeamTurn();
+            boolean inCheck = updated.game().isInCheck(turn);
+            boolean inCheckmate = updated.game().isInCheckmate(turn);
+
+            String userInCheckOrMate = (turn.toString().equals("WHITE")) ? updated.whiteUsername() : updated.blackUsername();
+
+            if (inCheckmate) {
+                NotificationMessage mateNotification = new NotificationMessage(userInCheckOrMate + " is in checkmate");
+                sessions.broadcast(command.getGameID(), mateNotification, null);
+                updated.game().setFinished(true);
+                gameService.updateGame(updated);
+                return;
+            }
+
+            if (inCheck) {
+                NotificationMessage checkNotification = new NotificationMessage(userInCheckOrMate + " is in check");
+                sessions.broadcast(command.getGameID(), checkNotification, null);
+            }
+
 
         } catch (Exception ex) {
             sendError(session, "Error: " + ex.getMessage());
