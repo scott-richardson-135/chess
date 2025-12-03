@@ -169,10 +169,14 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 sendError(session, "Error: game does not exist");
                 return;
             }
+            if (game.game().getFinished()) {
+                sendError(session, "Error: game is already finished");
+                return;
+            }
 
             String color = gameService.getPlayerColor(command.getGameID(), username);
             if (color == null) {
-                sendError(session, "Error: Observers can't make resign");
+                sendError(session, "Error: Observers can't resign");
                 return;
             }
 
@@ -183,12 +187,13 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 updated = new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.game());
             }
 
+            updated.game().setFinished(true);
+
             gameService.updateGame(updated); //Remove the player from the game
 
             NotificationMessage notification = new NotificationMessage(username + " resigned.");
             sessions.broadcast(command.getGameID(), notification, null);
 
-            //TODO I gotta figure out how to make the game unplayable now
 
         } catch (Exception ex) {
             sendError(session, "Error: " + ex.getMessage());

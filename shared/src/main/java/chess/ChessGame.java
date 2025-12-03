@@ -14,6 +14,7 @@ public class ChessGame {
 
     private ChessBoard board;
     private TeamColor currentTurn;
+    private boolean finished = false;
 
     public ChessGame() {
         board = new ChessBoard();
@@ -35,6 +36,14 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         currentTurn = team;
+    }
+
+    public void setFinished(Boolean finished) {
+        this.finished = finished;
+    }
+
+    public boolean getFinished() {
+        return finished;
     }
 
     /**
@@ -90,6 +99,10 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (finished) {
+            throw new InvalidMoveException();
+        }
+
         ChessPiece piece = board.getPiece(move.getStartPosition());
         if (piece == null) {
             throw new InvalidMoveException();
@@ -100,6 +113,7 @@ public class ChessGame {
         if (!legalMoves.contains(move) || currentTurn != piece.getTeamColor()) {
             throw new InvalidMoveException();
         }
+
 
 
         movePiece(move);
