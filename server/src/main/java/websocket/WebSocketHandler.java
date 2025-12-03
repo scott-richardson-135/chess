@@ -138,6 +138,20 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             sessions.removeSessionFromGame(command.getGameID(), session);
 
+            String color = gameService.getPlayerColor(command.getGameID(), username);
+            GameData updated;
+            if (color == null) {
+                updated = game;
+            } else if (color.equals("WHITE")) {
+                updated = new GameData(game.gameID(), null, game.blackUsername(), game.gameName(), game.game());
+            } else if (color.equals("BLACK")) {
+                updated = new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.game());
+            } else {
+                updated = game;
+            }
+            gameService.updateGame(updated);
+
+
             NotificationMessage notification = new NotificationMessage(username + " left the game");
             sessions.broadcast(command.getGameID(), notification, session);
 
