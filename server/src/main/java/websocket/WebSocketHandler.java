@@ -41,7 +41,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 case CONNECT -> handleConnectCommand(command, session);
                 case MAKE_MOVE -> handleMakeMove(command, session);
                 case LEAVE -> handleLeave(command, session);
-                case RESIGN -> handleResign(command);
+                case RESIGN -> handleResign(command, session);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -82,7 +82,6 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     }
 
     private void handleMakeMove(UserGameCommand command, Session session) throws IOException {
-        System.out.println("handling a make move command");
 
         try {
             String username = userService.getUsernameFromToken(command.getAuthToken());
@@ -94,7 +93,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
 
             String color = gameService.getPlayerColor(command.getGameID(), username);
             if (color == null) {
-                sendError(session, "Error: Observers can't make moves.");
+                sendError(session, "Error: Observers can't make moves");
                 return;
             }
 
@@ -147,8 +146,39 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         }
     }
 
-    private void handleResign(UserGameCommand command) {
-        System.out.println("handling a resign command");
+    private void handleResign(UserGameCommand command, Session session) throws IOException {
+        try {
+            String username = userService.getUsernameFromToken(command.getAuthToken());
+
+            GameData game = gameService.getGame(command.getGameID());
+            if (game == null) {
+                sendError(session, "Error: game does not exist");
+                return;
+            }
+
+            String color = gameService.getPlayerColor(command.getGameID(), username);
+            if (color == null) {
+                sendError(session, "Error: Observers can't make resign");
+                return;
+            }
+
+            GameData updated;
+            if (color.equals("WHITE")) {
+                updated = new GameData(game.gameID(), null, game.blackUsername(), game.gameName(), game.game());
+            } else  {
+                updated = new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.game());
+            }
+
+            gameService.updateGame(updated); //Remove the player from the game
+
+            NotificationMessage notification = new NotificationMessage(username + " resigned.");
+            sessions.broadcast(command.getGameID(), notification, null);
+
+            //TODO I gotta figure out how to make the game unplayable now
+
+        } catch (Exception ex) {
+            sendError(session, "Error: " + ex.getMessage());
+        }
     }
 
     private void sendError(Session session, String message) throws IOException {
