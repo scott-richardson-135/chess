@@ -92,13 +92,25 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
                 sendError(session, "Error: game not found");
             }
 
+            String color = gameService.getPlayerColor(command.getGameID(), username);
+            if (color == null) {
+                sendError(session, "Error: Observers can't make moves.");
+                return;
+            }
+
+
             ChessGame chessGame = game.game();
+            if (!chessGame.getTeamTurn().toString().equals(color)) {
+                sendError(session, "Error: Not your turn");
+                return;
+            }
 
             //try to make the move, and then we'll save it later if it works
             try {
                 chessGame.makeMove(command.getMove());
             } catch (InvalidMoveException e) {
                 sendError(session, "Invalid move: " + e.getMessage());
+                return;
             }
 
             GameData updated = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), chessGame);
