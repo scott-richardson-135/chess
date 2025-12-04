@@ -123,4 +123,8 @@ public class ServerFacade {
         return null;
     }
 
+    public String getServerUrl() {
+        return serverUrl;
+    }
+
 }
