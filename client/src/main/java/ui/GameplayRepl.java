@@ -2,6 +2,7 @@ package ui;
 
 import chess.ChessGame;
 import model.AuthData;
+import model.GameData;
 
 public class GameplayRepl {
 
@@ -21,5 +22,14 @@ public class GameplayRepl {
         //somehow figure out how to draw the corresponding game instead of a new one
         ChessGame game = new ChessGame();
         BoardDrawer.drawBoard(game, isWhite);
+    }
+
+    public void printMessage(String message) {
+        System.out.println(message);
+    }
+
+    public void updateGame(GameData game) {
+        ChessGame updated = game.game();
+        BoardDrawer.drawBoard(updated, isWhite);
     }
 }
