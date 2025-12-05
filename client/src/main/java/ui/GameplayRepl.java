@@ -1,6 +1,8 @@
 package ui;
 
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import model.AuthData;
 import model.GameData;
 import websocket.ChessGameHandler;
@@ -95,7 +97,34 @@ public class GameplayRepl {
     }
 
     private void handleMakeMove() {
-        System.out.println("handling make move...");
+        Scanner scanner = new Scanner(System.in);
+
+        try {
+            System.out.print("Which piece to move? (i.e. e2) ");
+            String startInput = scanner.nextLine().trim().toLowerCase();
+            int startCol = startInput.charAt(0) - 'a' + 1; //pretty much magic converting letter to col number
+            int startRow = Integer.parseInt(startInput.substring(1));
+
+            System.out.print("Where to move to? (i.e. e4) ");
+            String endInput = scanner.nextLine().trim().toLowerCase();
+            int endCol = endInput.charAt(0) - 'a' + 1;
+            int endRow = Integer.parseInt(endInput.substring(1));
+
+            //TODO maybe check promotion here but only if I have to lol
+
+            ChessPosition start = new ChessPosition(startRow, startCol);
+            ChessPosition end = new ChessPosition(endRow, endCol);
+
+            ChessMove move = new ChessMove(start, end, null);
+
+            ws.makeMove(auth.authToken(), gameId, move);
+
+        } catch (Exception e) {
+            printMessage("Error making move: " + e.getMessage());
+        }
+
+
+
     }
 
     private void handleResign() throws IOException {
