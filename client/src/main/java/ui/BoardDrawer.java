@@ -5,11 +5,13 @@ import chess.ChessGame;
 import chess.ChessPiece;
 import chess.ChessPosition;
 
+import java.util.Collection;
+
 import static ui.EscapeSequences.*;
 
 public class BoardDrawer {
 
-    public static void drawBoard(ChessGame game, boolean isWhite) {
+    public static void drawBoard(ChessGame game, boolean isWhite, Collection<ChessPosition> highlights) {
         if (game == null || game.getBoard() == null) {
             System.out.println("No board available");
             return;
@@ -41,10 +43,18 @@ public class BoardDrawer {
             //draw the squares and pieces for the row
             for (int col : cols) {
                 boolean lightSquare = (row + col) % 2 == 1;
-                String bgColor = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
-                ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+                ChessPosition position = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(position);
                 String symbol = getSymbol(piece);
 
+                boolean isHighlighted = highlights != null && highlights.contains(position);
+                String bgColor;
+
+                if (isHighlighted) {
+                    bgColor = SET_BG_COLOR_GREEN;
+                } else {
+                    bgColor = lightSquare ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREY;
+                }
                 System.out.print(bgColor + symbol + RESET_BG_COLOR);
             }
 
@@ -58,6 +68,10 @@ public class BoardDrawer {
             System.out.print(getLetter(col) + "  ");
         }
         System.out.println();
+    }
+
+    public static void drawBoard(ChessGame game, boolean isWhite) {
+        drawBoard(game, isWhite, null);
     }
 
     private static String getLetter(int col) {

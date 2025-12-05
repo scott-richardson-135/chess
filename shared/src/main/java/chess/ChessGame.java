@@ -100,21 +100,23 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         if (finished) {
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("Game is finished");
         }
 
         ChessPiece piece = board.getPiece(move.getStartPosition());
         if (piece == null) {
-            throw new InvalidMoveException();
+            throw new InvalidMoveException("No piece selected");
         }
         Collection<ChessMove> legalMoves = validMoves(move.getStartPosition());
 
 
-        if (!legalMoves.contains(move) || currentTurn != piece.getTeamColor()) {
-            throw new InvalidMoveException();
+        if (!legalMoves.contains(move)) {
+            throw new InvalidMoveException("Invalid move");
         }
 
-
+        if (currentTurn != piece.getTeamColor()) {
+            throw new InvalidMoveException("Not your turn");
+        }
 
         movePiece(move);
 

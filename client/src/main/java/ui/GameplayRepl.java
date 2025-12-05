@@ -10,7 +10,10 @@ import websocket.GameHandler;
 import websocket.WebSocketFacade;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 public class GameplayRepl {
 
@@ -132,7 +135,46 @@ public class GameplayRepl {
     }
 
     private void handleHighlight() {
-        System.out.println("handling highlight...");
+        Scanner scanner = new Scanner(System.in);
+
+        System.out.print("Enter piece to highlight (i.e. e2) ");
+        String pieceInput = scanner.nextLine().trim().toLowerCase();
+
+        if (pieceInput.length() != 2) {
+            printMessage("Error: invalid position format");
+            return;
+        }
+
+        char colChar = pieceInput.charAt(0);
+        char rowChar = pieceInput.charAt(1);
+
+        if (colChar < 'a' || colChar > 'h') {
+            printMessage("Error: column must be a-h");
+            return;
+        }
+
+        if (rowChar < '1' || rowChar > '8') {
+            printMessage("Error: row must be 1-8");
+            return;
+        }
+
+        int pieceCol = colChar - 'a' + 1;
+        int pieceRow = Character.getNumericValue(rowChar);
+
+        ChessPosition position = new ChessPosition(pieceRow, pieceCol);
+
+        highlightLegalMoves(position);
+    }
+
+    private void highlightLegalMoves(ChessPosition position) {
+        Collection<ChessMove> legalMoves = currentGame.validMoves(position);
+
+        Set<ChessPosition> endPositions = new HashSet<>();
+        for (ChessMove move : legalMoves) {
+            endPositions.add(move.getEndPosition());
+        }
+
+        BoardDrawer.drawBoard(currentGame, isWhite, endPositions);
     }
 
 }
