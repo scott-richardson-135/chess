@@ -41,7 +41,6 @@ public class GameplayRepl {
     public void run() {
         ChessGame game = new ChessGame();
         currentGame = game;
-        BoardDrawer.drawBoard(game, isWhite);
 
         Scanner scanner = new Scanner(System.in);
         printMenu();
@@ -71,12 +70,14 @@ public class GameplayRepl {
 
     public void printMessage(String message) {
         System.out.println(message);
+        System.out.print(auth.username() + " >>> ");
     }
 
     public void updateGame(GameData game) {
         ChessGame updated = game.game();
         currentGame = updated;
         BoardDrawer.drawBoard(updated, isWhite);
+        System.out.print(auth.username() + " >>> ");
     }
 
     private void printMenu() {
@@ -97,8 +98,8 @@ public class GameplayRepl {
         System.out.println("handling make move...");
     }
 
-    private void handleResign() {
-        System.out.println("handling resign...");
+    private void handleResign() throws IOException {
+        ws.resign(auth.authToken(), gameId);
     }
 
     private void handleHighlight() {
