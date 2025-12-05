@@ -113,7 +113,7 @@ public class GameplayRepl {
             int endCol = endInput.charAt(0) - 'a' + 1;
             int endRow = Integer.parseInt(endInput.substring(1));
 
-            //TODO maybe check promotion here but only if I have to lol
+            //TO DO maybe check promotion here but only if I have to lol
 
             ChessPosition start = new ChessPosition(startRow, startCol);
             ChessPosition end = new ChessPosition(endRow, endCol);

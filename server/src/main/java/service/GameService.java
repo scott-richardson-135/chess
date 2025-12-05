@@ -135,8 +135,12 @@ public class GameService {
             return null;
         }
 
-        if (username.equals(game.whiteUsername())) return "WHITE";
-        if (username.equals(game.blackUsername())) return "BLACK";
+        if (username.equals(game.whiteUsername())) {
+            return "WHITE";
+        }
+        if (username.equals(game.blackUsername())) {
+            return "BLACK";
+        }
         return null;
     }
 
