@@ -26,7 +26,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
     @Override
     public void handleConnect(WsConnectContext ctx) {
         System.out.println("Websocket connected");
-        ctx.enableAutomaticPings();
+
     }
 
     @Override
@@ -38,7 +38,7 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
             Session session = ctx.session;
 
             switch (command.getCommandType()) {
-                case CONNECT -> handleConnectCommand(command, session);
+                case CONNECT -> handleConnectCommand(command, session, ctx);
                 case MAKE_MOVE -> handleMakeMove(command, session);
                 case LEAVE -> handleLeave(command, session);
                 case RESIGN -> handleResign(command, session);
@@ -53,8 +53,9 @@ public class WebSocketHandler implements WsConnectHandler, WsMessageHandler, WsC
         System.out.println("Websocket closed");
     }
 
-    private void handleConnectCommand(UserGameCommand command, Session session) throws IOException {
+    private void handleConnectCommand(UserGameCommand command, Session session, WsMessageContext ctx) throws IOException {
         try {
+            ctx.enableAutomaticPings();
             String username = userService.getUsernameFromToken(command.getAuthToken());
 
             //get game and check if it is real

@@ -27,31 +27,33 @@ public class WebSocketFacade extends Endpoint {
         WebSocketContainer container = ContainerProvider.getWebSocketContainer();
         this.session = container.connectToServer(this, uri);
 
-        this.session.addMessageHandler((MessageHandler.Whole<String>) this::onMessage);
+        this.session.addMessageHandler(new MessageHandler.Whole<String>() {
+            public void onMessage(String jsonMessage) {
+                ServerMessage message = gson.fromJson(jsonMessage, ServerMessage.class);
+
+
+                switch (message.getServerMessageType()) {
+                    case NOTIFICATION -> {
+                        NotificationMessage notification = gson.fromJson(jsonMessage, NotificationMessage.class);
+                        handler.printMessage(notification.getMessage());
+                    }
+                    case ERROR -> {
+                        ErrorMessage error = gson.fromJson(jsonMessage, ErrorMessage.class);
+                        handler.printMessage(error.errorMessage);
+                    }
+                    case LOAD_GAME -> {
+                        LoadGameMessage load = gson.fromJson(jsonMessage, LoadGameMessage.class);
+                        handler.updateGame(load.game);
+                    }
+                }
+            }
+        });
     }
 
     @Override
     public void onOpen(Session session, EndpointConfig config) {}
 
-    private void onMessage(String jsonMessage) {
-        ServerMessage message = gson.fromJson(jsonMessage, ServerMessage.class);
 
-        System.out.println("Raw message: " + jsonMessage);
-        switch (message.getServerMessageType()) {
-            case NOTIFICATION -> {
-                NotificationMessage notification = gson.fromJson(jsonMessage, NotificationMessage.class);
-                handler.printMessage(notification.getMessage());
-            }
-            case ERROR -> {
-                ErrorMessage error = gson.fromJson(jsonMessage, ErrorMessage.class);
-                handler.printMessage(error.errorMessage);
-            }
-            case LOAD_GAME -> {
-                LoadGameMessage load = gson.fromJson(jsonMessage, LoadGameMessage.class);
-                handler.updateGame(load.game);
-            }
-        }
-    }
 
 
     //outgoing messages
