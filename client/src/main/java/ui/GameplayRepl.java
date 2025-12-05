@@ -105,13 +105,45 @@ public class GameplayRepl {
         try {
             System.out.print("Which piece to move? (i.e. e2) ");
             String startInput = scanner.nextLine().trim().toLowerCase();
+            if (startInput.length() != 2) {
+                printMessage("Error: invalid piece");
+                return;
+            }
+
             int startCol = startInput.charAt(0) - 'a' + 1; //pretty much magic converting letter to col number
-            int startRow = Integer.parseInt(startInput.substring(1));
+
+            int startRow;
+            try {
+                startRow = Integer.parseInt(startInput.substring(1));
+            } catch (NumberFormatException e) {
+                printMessage("Error: invalid row in piece position");
+                return;
+            }
+
+            if (startCol < 1 || startCol > 8 || startRow < 1 || startRow > 8) {
+                printMessage("Error: invalid start position");
+                return;
+            }
 
             System.out.print("Where to move to? (i.e. e4) ");
             String endInput = scanner.nextLine().trim().toLowerCase();
+            if (endInput.length() != 2) {
+                printMessage("Error: invalid piece");
+                return;
+            }
             int endCol = endInput.charAt(0) - 'a' + 1;
-            int endRow = Integer.parseInt(endInput.substring(1));
+            int endRow;
+            try {
+                endRow = Integer.parseInt(endInput.substring(1));
+            } catch (NumberFormatException e) {
+                printMessage("Error: invalid row in piece position");
+                return;
+            }
+
+            if (endCol < 1 || endCol > 8 || endRow < 1 || endRow > 8) {
+                printMessage("Error: invalid end position");
+                return;
+            }
 
             //TO DO maybe check promotion here but only if I have to lol
 
@@ -162,6 +194,10 @@ public class GameplayRepl {
         int pieceRow = Character.getNumericValue(rowChar);
 
         ChessPosition position = new ChessPosition(pieceRow, pieceCol);
+        if (currentGame.getBoard().getPiece(position) == null) {
+            printMessage("Error: no piece selected");
+            return;
+        }
 
         highlightLegalMoves(position);
     }
