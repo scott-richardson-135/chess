@@ -36,10 +36,11 @@ public class WebSocketFacade extends Endpoint {
     private void onMessage(String jsonMessage) {
         ServerMessage message = gson.fromJson(jsonMessage, ServerMessage.class);
 
+        System.out.println("Raw message: " + jsonMessage);
         switch (message.getServerMessageType()) {
             case NOTIFICATION -> {
                 NotificationMessage notification = gson.fromJson(jsonMessage, NotificationMessage.class);
-                handler.printMessage(notification.message);
+                handler.printMessage(notification.getMessage());
             }
             case ERROR -> {
                 ErrorMessage error = gson.fromJson(jsonMessage, ErrorMessage.class);

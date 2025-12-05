@@ -7,6 +7,7 @@ import websocket.ChessGameHandler;
 import websocket.GameHandler;
 import websocket.WebSocketFacade;
 
+import java.io.IOException;
 import java.util.Scanner;
 
 public class GameplayRepl {
@@ -49,13 +50,21 @@ public class GameplayRepl {
             System.out.print(auth.username() + " >>> ");
             String command = scanner.nextLine().trim().toLowerCase();
 
-            switch (command) {
-                case "1", "help" -> printMenu();
-                case "2", "redraw" -> BoardDrawer.drawBoard(currentGame, isWhite);
-                case "3", "leave" -> handleLeave();
-                case "4", "move" -> handleMakeMove();
-                case "5", "resign" -> handleResign();
-                case "6", "highlight" -> handleHighlight();
+            try {
+                switch (command) {
+                    case "1", "help" -> printMenu();
+                    case "2", "redraw" -> BoardDrawer.drawBoard(currentGame, isWhite);
+                    case "3", "leave" -> {
+                        handleLeave();
+                        return;
+                    }
+                    case "4", "move" -> handleMakeMove();
+                    case "5", "resign" -> handleResign();
+                    case "6", "highlight" -> handleHighlight();
+                    default -> System.out.println("Invalid command. Type 'help' for help.");
+                }
+            } catch (Exception e) {
+                printMessage("Error: " + e.getMessage());
             }
         }
     }
@@ -80,8 +89,8 @@ public class GameplayRepl {
         System.out.println("6. Highlight legal moves");
     }
 
-    private void handleLeave() {
-        System.out.println("handling leave...");
+    private void handleLeave() throws IOException {
+        ws.leave(auth.authToken(), gameId);
     }
 
     private void handleMakeMove() {
